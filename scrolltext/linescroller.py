@@ -3,13 +3,14 @@ A simple side scrolling text application.
 """
 from os import getenv
 from time import sleep
+import shutil
 
 
 DEF_SCROLL_TEXT = """\
 Hello, this is a  classic side scrolling text. You can override it by setting the \
 environment variable 'SCROLL_TEXT'. It is supposed to be a simple example."""
 SCROLL_TEXT = getenv("SCROLL_TEXT") or DEF_SCROLL_TEXT
-VISIBILE_TEXT_LENGTH = 80
+VISIBILE_TEXT_LENGTH = shutil.get_terminal_size((80, 1)).columns
 
 
 def linescroller():
