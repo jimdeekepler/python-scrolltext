@@ -21,8 +21,3 @@ jobs:
     - name: Analysing the code with pylint
       run: |
         pylint $(git ls-files '*.py')
-    - name: TODO:Update readme-foo?
-      uses: Silleellie/pylint-github-action@v1
-      with:
-        package-path: scrolltext
-        python-version: 3.11
