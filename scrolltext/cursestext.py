@@ -1,11 +1,11 @@
 """
 A simple curses-based side scrolling text application.
 """
-from utils import CharacterScroller
 from curses import wrapper, error
 from os import getenv
 import logging
 import shutil
+from utils import CharacterScroller
 
 
 logging.basicConfig(filename="cursesscroller.log", filemode="w", level=logging.DEBUG)
@@ -24,17 +24,19 @@ VISIBILE_TEXT_LENGTH = shutil.get_terminal_size().columns - 1
 def curses_scroller(win):
     """
     Curses-main: render a text in a side-scrolling manner, using curses.
+
+    :param win: Internal curses based object
+    :type win: curses._window
     """
     scroller = CharacterScroller(VISIBILE_TEXT_LENGTH, VISIBILE_TEXT_LENGTH, SCROLL_TEXT)
-    if True:
-        win.addstr(1, 10, "Scroll-Text")
-        win.timeout(125)
-        for text in scroller:
-            win_text = text
-            win.addstr(3, 1, win_text)
-            win.redrawwin()
-            win.getch(4, 0)
-            win.redrawwin()
+    win.addstr(1, 10, "Scroll-Text")
+    win.timeout(125)
+    for text in scroller:
+        win_text = text
+        win.addstr(3, 1, win_text)
+        win.redrawwin()
+        win.getch(4, 0)
+        win.redrawwin()
 
 
 try:
