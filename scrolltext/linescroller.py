@@ -1,9 +1,9 @@
 """
 A simple side scrolling text application.
 """
-from utils import CharacterScroller
 from os import getenv
 from time import sleep
+from utils import CharacterScroller
 
 
 DEF_SCROLL_TEXT = """\
