@@ -41,7 +41,7 @@ jobs:
         flake8 . --count --exit-zero --max-complexity=2 --max-line-length=100 --statistics
     - name: Unittests
       run: |
-        python tests/utils_test.py        
+        python utils_tests.py
     #- name: Test with pytest  # maybe later?
     #  run: |
     #    pytest
