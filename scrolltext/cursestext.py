@@ -39,7 +39,7 @@ def curses_scroller(win):
         win.redrawwin()
 
 
-try: # noqa: C901 ignoring 'TryExcept 42' is too complex - fix later
+try:  # noqa: C901 ignoring 'TryExcept 42' is too complex - fix later
     wrapper(curses_scroller)
 except error as e:
     log.exception(e)
