@@ -21,7 +21,7 @@ class CharacterScrollTests(unittest.TestCase):
         self.assertEqual(cnt, len(scroll_text) + 2)
 
     def test_scroll_character_for_character(self):
-        """"Test with visibile window size set to 1, or character by 
+        """"Test with visibile window size set to 1, or character by
         character respectively."""
         scroll_text = "Hello, world"
         expected = list(scroll_text)
@@ -59,7 +59,7 @@ class CharacterScrollTests(unittest.TestCase):
         scroll_text = "Hello, world"
         expected = [" Hello, world ", "Hello, world ", "ello, world ", "llo, world ",
                     "lo, world ", "o, world ", ", world ", " world ", "world ",
-                    "orld ", "rld ", "ld ", "d ", " " ]
+                    "orld ", "rld ", "ld ", "d ", " "]
         cnt = 0
         for text in CharacterScroller(80, 1, scroll_text):
             self.assertEqual(expected[cnt], text)
