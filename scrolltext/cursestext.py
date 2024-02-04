@@ -5,7 +5,7 @@ from curses import wrapper, error
 from os import getenv
 import logging
 import shutil
-from utils import CharacterScroller
+from .utils import CharacterScroller
 
 
 logging.basicConfig(filename="cursesscroller.log", filemode="w", level=logging.DEBUG)
@@ -40,10 +40,12 @@ def curses_scroller(win):
 
 
 def main():
+    """Main usese curses.wrapper. See curses doc for details.
+    """
     try:  # noqa: C901 ignoring 'TryExcept 42' is too complex - fix later
         wrapper(curses_scroller)
-    except error as e:
-        log.exception(e)
+    except error as ex:
+        log.exception(ex)
     finally:
         log.debug("end")
 
