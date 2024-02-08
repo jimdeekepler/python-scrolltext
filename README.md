@@ -5,4 +5,6 @@
 
 ### Example
 
-    SCROLL_TEXT="Hello, world." python scrolltext/linescroller.py
+    SCROLL_TEXT="Hello, world." python -m scrolltext.linescroller
+
+    SCROLL_TEXT="Hello, world." python -m scrolltext.cursestext
