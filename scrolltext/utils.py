@@ -3,6 +3,10 @@ Utilities for line-based text scrollers.
 """
 
 
+CLEAR = "\033[2J"
+HOME = "\033[H"
+
+
 class CharacterScroller:
     """
     Utility class  for all character based text-scrollers.

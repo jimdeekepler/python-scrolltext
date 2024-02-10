@@ -5,6 +5,7 @@ import shutil
 from os import getenv
 from time import sleep
 from .utils import CharacterScroller
+from .utils import CLEAR, HOME
 
 
 DEF_SCROLL_TEXT = """\
@@ -18,6 +19,7 @@ def linescroller():
     """
     Prints a text in a side-scrolling manner.
     """
+    print(f"{CLEAR}{HOME}")
     scroller = CharacterScroller(VISIBILE_TEXT_LENGTH, VISIBILE_TEXT_LENGTH, SCROLL_TEXT)
     for text in scroller:
         win_text = text
