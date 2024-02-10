@@ -45,3 +45,8 @@ jobs:
     #- name: Test with pytest  # maybe later?
     #  run: |
     #    pytest
+    - name: Coverage
+      run: |
+        pip install coverage
+        PYTHONPATH=. coverage run tests/utils_tests.py
+        coverage html
