@@ -28,6 +28,7 @@ def curses_scroller(win):
     :param win: Internal curses based object
     :type win: curses._window
     """
+    is_logging_debug = log.isEnabledFor(logging.DEBUG)
     curses.curs_set(0)  # Hide the cursor
     winsize = win.getmaxyx()
     visibile_height = winsize[0] - 1
@@ -42,6 +43,8 @@ def curses_scroller(win):
         win.addstr(3, 1, win_text)
         win.redrawwin()
         character = win.getch(4, 0)
+        if is_logging_debug and character != -1:
+            log.debug("got key (%d)  type %s", character, type(character))
         if character != -1 and (chr(character) in QUIT_CHARACTERS):
             return
         win.redrawwin()
