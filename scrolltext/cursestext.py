@@ -18,6 +18,7 @@ DEF_SCROLL_TEXT = """\
 Hello, this is a  classic side scrolling text. You can override it by setting the \
 environment variable 'SCROLL_TEXT'. It is supposed to be a simple example."""
 SCROLL_TEXT = getenv("SCROLL_TEXT") or DEF_SCROLL_TEXT
+QUIT_CHARACTERS = ["\x1B", "Q", "q"]
 
 
 def curses_scroller(win):
@@ -40,7 +41,9 @@ def curses_scroller(win):
         win_text = text
         win.addstr(3, 1, win_text)
         win.redrawwin()
-        win.getch(4, 0)
+        character = win.getch(4, 0)
+        if character != -1 and (chr(character) in QUIT_CHARACTERS):
+            return
         win.redrawwin()
 
 
