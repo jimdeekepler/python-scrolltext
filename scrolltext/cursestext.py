@@ -4,7 +4,6 @@ A simple curses-based side scrolling text application.
 from curses import wrapper, error
 from os import getenv
 import logging
-import shutil
 from .utils import CharacterScroller
 
 
@@ -18,7 +17,6 @@ DEF_SCROLL_TEXT = """\
 Hello, this is a  classic side scrolling text. You can override it by setting the \
 environment variable 'SCROLL_TEXT'. It is supposed to be a simple example."""
 SCROLL_TEXT = getenv("SCROLL_TEXT") or DEF_SCROLL_TEXT
-VISIBILE_TEXT_LENGTH = shutil.get_terminal_size().columns - 1
 
 
 def curses_scroller(win):
@@ -28,8 +26,13 @@ def curses_scroller(win):
     :param win: Internal curses based object
     :type win: curses._window
     """
-    scroller = CharacterScroller(VISIBILE_TEXT_LENGTH, VISIBILE_TEXT_LENGTH, SCROLL_TEXT)
+    winsize = win.getmaxyx()
+    visibile_height = winsize[0] - 1
+    visibile_text_length = winsize[1] - 1
+    log.debug("win dimensions: (%d, %d)", visibile_text_length, visibile_height)
+    scroller = CharacterScroller(visibile_text_length, visibile_text_length, SCROLL_TEXT)
     win.addstr(1, 10, "Scroll-Text")
+    win.addstr(visibile_height, 0, "You can quit with 'q' or 'Q'.")
     win.timeout(125)
     for text in scroller:
         win_text = text
