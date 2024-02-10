@@ -3,6 +3,7 @@ A simple curses-based side scrolling text application.
 """
 from curses import wrapper, error
 from os import getenv
+import curses
 import logging
 from .utils import CharacterScroller
 
@@ -26,6 +27,7 @@ def curses_scroller(win):
     :param win: Internal curses based object
     :type win: curses._window
     """
+    curses.curs_set(0)  # Hide the cursor
     winsize = win.getmaxyx()
     visibile_height = winsize[0] - 1
     visibile_text_length = winsize[1] - 1
