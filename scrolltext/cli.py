@@ -7,6 +7,9 @@ from scrolltext import linescroller
 
 
 def main():
+    """
+    Main method.
+    """
     invoke = linescroller
     for arg in sys.argv[1:]:
         if "cursestext" == arg:
