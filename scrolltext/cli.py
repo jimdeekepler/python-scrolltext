@@ -6,13 +6,10 @@ from scrolltext import cursesscroller
 from scrolltext import linescroller
 
 
-DEF_ACTION = linescroller
-action = DEF_ACTION
+def main():
+    invoke = linescroller
+    for arg in sys.argv[1:]:
+        if "cursestext" == arg:
+            invoke = cursesscroller
 
-
-for arg in sys.argv[1:]:
-    if "cursestext" == arg:
-        action = cursesscroller
-
-
-action()
+    invoke()
