@@ -13,3 +13,7 @@ def main():
             invoke = cursesscroller
 
     invoke()
+
+
+if __name__ == "__main__":
+    main()
