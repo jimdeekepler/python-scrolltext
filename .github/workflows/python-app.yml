@@ -49,4 +49,4 @@ jobs:
       run: |
         pip install coverage
         PYTHONPATH=. coverage run tests/utils_tests.py
-        coverage html
+        coverage report
