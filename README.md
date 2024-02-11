@@ -3,7 +3,14 @@
 
 ## python-scrolltext
 
-### Example
+### Example (since v0.0.4)
+
+    SCROLL_TEXT="Hello, world." scrolltext
+
+    SCROLL_TEXT="Hello, world." scrolltext cursestext
+
+
+### Example (earlier versions)
 
     SCROLL_TEXT="Hello, world." python -m scrolltext.linescroller
 
