@@ -28,19 +28,22 @@ def curses_scroller(win):
     :param win: Internal curses based object
     :type win: curses._window
     """
+    box = True
+    if box:
+        win.box()
     is_logging_debug = log.isEnabledFor(logging.DEBUG)
     curses.curs_set(0)  # Hide the cursor
     winsize = win.getmaxyx()
     visibile_height = winsize[0] - 1
-    visibile_text_length = winsize[1] - 1
+    visibile_text_length = winsize[1] - (2 if box else 0)
     log.debug("win dimensions: (%d, %d)", visibile_text_length, visibile_height)
     scroller = CharacterScroller(visibile_text_length, visibile_text_length, SCROLL_TEXT)
     win.addstr(1, 10, "Scroll-Text")
-    win.addstr(visibile_height, 0, "You can quit with 'q' or 'Q'.")
+    win.addstr(visibile_height, (2 if box else 0), " You can quit with 'q' or 'Q'.")
     win.timeout(125)
     for text in scroller:
         win_text = text
-        win.addstr(3, 1, win_text)
+        win.addstr(3, (1 if box else 0), win_text)
         win.redrawwin()
         character = win.getch(4, 0)
         if is_logging_debug and character != -1:
