@@ -4,6 +4,7 @@ A simple side scrolling text application.
 import shutil
 import sys
 from os import getenv
+from time import sleep
 from .utils import CharacterScroller
 from .utils import CLEAR, HOME
 
@@ -11,8 +12,6 @@ from .utils import CLEAR, HOME
 IS_WINDOWS = sys.platform in ["msys", "win32", "nt"]
 if not IS_WINDOWS:
     from .getchtimeout import GetchWithTimeout
-else:
-    from time import sleep
 
 
 DEF_SCROLL_TEXT = """\
