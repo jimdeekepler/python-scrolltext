@@ -5,7 +5,18 @@
 
 ### Example (since v0.0.4)
 
+### Plain Terminal version
+
     SCROLL_TEXT="Hello, world." scrolltext
+
+You can select the line via `SCROLL_LINE` variable. Negative values are counting
+from bottom to top, e.g. the following selects the 2nd last line in the current
+terminal:
+
+    SCROLL_TEXT="Hello, world." SCROLL_LINE=-2 scrolltext
+
+
+### Curses Version
 
     SCROLL_TEXT="Hello, world." scrolltext cursestext
 
