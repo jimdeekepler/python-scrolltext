@@ -18,6 +18,8 @@ terminal:
 
     SCROLL_TEXT="Hello, world." scrolltext cursestext
 
+This will create a logfile: 'cursesscroller.log' in the current directory.
+
 
 ### Example (earlier versions)
 
