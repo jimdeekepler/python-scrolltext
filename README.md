@@ -3,8 +3,6 @@
 
 ## python-scrolltext
 
-### Example (since v0.0.4)
-
 ### Plain Terminal version
 
     SCROLL_TEXT="Hello, world." scrolltext
