@@ -74,7 +74,7 @@ def _check_input(getch):
     Use getchtimeout to get a character. If "Q" or "q" is given, then it raises SystemExit
     """
     character = getch.getch(timeout=.15)
-    if character is not None and character in ["Q", "q"]:
+    if character is not None and character in ["\033", "\x1b", "", "\r", "", " ", "Q", "q"]:
         raise RuntimeError()
 
 
