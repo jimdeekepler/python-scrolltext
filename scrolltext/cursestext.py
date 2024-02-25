@@ -8,7 +8,9 @@ import logging
 from .utils import CharacterScroller
 
 
-logging.basicConfig(filename="cursesscroller.log", filemode="w", level=logging.DEBUG)
+VERBOSE = getenv("VERBOSE") in ["1", "y", "yes"] or False
+if VERBOSE:
+    logging.basicConfig(filename="cursesscroller.log", filemode="w", level=logging.DEBUG)
 log = logging.getLogger(__name__)
 
 
