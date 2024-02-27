@@ -20,9 +20,3 @@ terminal:
 
 This will create a logfile: 'cursesscroller.log' in the current directory.
 
-
-### Example (earlier versions)
-
-    SCROLL_TEXT="Hello, world." python -m scrolltext.linescroller
-
-    SCROLL_TEXT="Hello, world." python -m scrolltext.cursestext
