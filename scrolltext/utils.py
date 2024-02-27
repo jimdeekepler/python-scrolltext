@@ -35,7 +35,7 @@ def get_linenum(min_row, max_row):
     :type min_row: int
     :param max_row: Maximum line number
     :type max_row: int
-    :returns: int in [min_row, max_row] 
+    :returns: int in [min_row, max_row]
     """
     line = min_row
     try:
