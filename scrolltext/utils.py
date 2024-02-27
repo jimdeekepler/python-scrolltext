@@ -43,9 +43,7 @@ def get_linenum(min_row, max_row):
     except (TypeError, ValueError):
         pass
     if line < 0:
-        line = max_row + line
-    elif line > 0:
-        line -= 1
+        line = max_row + line + 1
     line = max(line, min_row)
     line = min(line, max_row)
     return line

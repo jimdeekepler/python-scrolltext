@@ -35,7 +35,7 @@ def curses_scroller(win):
     visibile_height = winsize[0] - 1
     visibile_text_length = winsize[1] - (2 if box else 0)
     log.debug("win dimensions: (%d, %d)", visibile_text_length, visibile_height)
-    line = get_linenum(3, visibile_height)
+    line = get_linenum(3, visibile_height - (1 if box else 0))
     scroller = CharacterScroller(visibile_text_length,
                                  visibile_text_length, SCROLL_TEXT)
     win.addstr(1, 10, "Scroll-Text")
