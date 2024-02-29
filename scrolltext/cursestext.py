@@ -8,8 +8,8 @@ import logging
 from .utils import (CharacterScroller,
                     get_linenum, SCROLL_TEXT)
 
-
-VERBOSE = getenv("VERBOSE") in ["1", "y", "yes"] or False
+TRUE_CHARACTERS = ["1", "y", "yes"]
+VERBOSE = getenv("VERBOSE") in TRUE_CHARACTERS or False
 if VERBOSE:
     logging.basicConfig(filename="cursesscroller.log", filemode="w", level=logging.DEBUG)
 log = logging.getLogger(__name__)
