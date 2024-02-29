@@ -36,13 +36,19 @@ def curses_scroller(win):
     visibile_text_length = winsize[1] - (2 if box else 0)
     log.debug("win dimensions: (%d, %d)", visibile_text_length, visibile_height)
     line = get_linenum(3, visibile_height - (1 if box else 0))
+    log.debug("screenline %d", line)
     scroller = CharacterScroller(visibile_text_length,
                                  visibile_text_length, SCROLL_TEXT)
     win.addstr(1, 10, "Scroll-Text")
-    win.addstr(visibile_height, (2 if box else 0), " You can quit with 'q' or 'Q'.")
+    if not box and line == visibile_height:
+        win.addstr(visibile_height - 2, 0, " You can quit with 'q' or 'Q'.")
+    else:
+        win.addstr(visibile_height, (2 if box else 0), " You can quit with 'q' or 'Q'.")
     win.timeout(125)
     for text in scroller:
         win_text = text
+        if not box and line == visibile_height:
+            win_text = text[:-1]
         win.addstr(line, (1 if box else 0), win_text)
         win.redrawwin()
         character = win.getch(4, 0)
