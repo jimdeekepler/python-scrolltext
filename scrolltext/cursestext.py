@@ -40,10 +40,7 @@ def curses_scroller(win):
     scroller = CharacterScroller(visibile_text_length,
                                  visibile_text_length, SCROLL_TEXT)
     win.addstr(1, 10, "Scroll-Text")
-    if not box and line == visibile_height:
-        win.addstr(visibile_height - 2, 0, " You can quit with 'q' or 'Q'.")
-    else:
-        win.addstr(visibile_height, (2 if box else 0), " You can quit with 'q' or 'Q'.")
+    add_quit_text(win, box, line, visibile_height)
     win.timeout(125)
     for text in scroller:
         win_text = text
@@ -51,12 +48,32 @@ def curses_scroller(win):
             win_text = text[:-1]
         win.addstr(line, (1 if box else 0), win_text)
         win.redrawwin()
-        character = win.getch(4, 0)
-        if character != -1:
-            log.debug("got key (%d)  type %s", character, type(character))
-        if character != -1 and (chr(character) in QUIT_CHARACTERS):
+        if check_quit(win):
             return
         win.redrawwin()
+
+
+def add_quit_text(win, box, line, visibile_height):
+    """
+    Adds a hint message to win.
+    """
+    if not box and line == visibile_height:
+        win.addstr(visibile_height - 2, 0, " You can quit with 'q' or 'Q'.")
+    else:
+        win.addstr(visibile_height, (2 if box else 0), " You can quit with 'q' or 'Q'.")
+
+
+def check_quit(win):
+    """
+    :returns: True, if a quit character is entered, False, otherwise.
+    :rtype: Boolean
+    """
+    character = win.getch(4, 0)
+    if character != -1:
+        log.debug("got key (%d)  type %s", character, type(character))
+    if character != -1 and (chr(character) in QUIT_CHARACTERS):
+        return True
+    return False
 
 
 def main():
