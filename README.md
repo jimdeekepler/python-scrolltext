@@ -42,4 +42,5 @@ or
 
 ### Scroll right-to-left reading text
 
-
+Using `SCROLL_DIRECTION=1` makes the text start scrolling from left-side of the terminal.
+This is used for right-to-left writing languages.
