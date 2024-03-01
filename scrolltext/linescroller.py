@@ -4,7 +4,7 @@ A simple side scrolling text application.
 import shutil
 import sys
 from time import sleep
-from .utils import (CLEAR, HOME, CharacterScroller, get_linenum, SCROLL_TEXT)
+from .utils import (CLEAR, HOME, CharacterScroller, get_linenum, SCROLL_TEXT, scroll_direction)
 
 
 IS_WINDOWS = sys.platform in ["msys", "win32", "nt"]
@@ -40,7 +40,7 @@ def _linescroller(getch):
     if line > 0:
         print(f"\033[{line}B", end="")
     scroller = CharacterScroller(VISIBILE_TEXT_LENGTH,
-                                 VISIBILE_TEXT_LENGTH, SCROLL_TEXT)
+                                 VISIBILE_TEXT_LENGTH, SCROLL_TEXT, scroll_direction)
     for text in scroller:
         win_text = text
         print(win_text, end="\r")
