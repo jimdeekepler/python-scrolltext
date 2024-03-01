@@ -38,3 +38,8 @@ In order to not draw the box, you can switch it off by defining the variable
 or
 
     SCROLL_BOX=0 SCROLL_LINE=-1 scrolltext cursestext
+
+
+### Scroll right-to-left reading text
+
+
