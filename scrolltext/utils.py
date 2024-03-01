@@ -28,7 +28,7 @@ def parse_int(var):
         return value
     except (TypeError, ValueError):
         pass
-    return value
+    return 0
 
 
 scroll_direction = parse_int(SCROLL_DIRECTION)
