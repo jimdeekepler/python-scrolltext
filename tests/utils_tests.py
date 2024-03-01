@@ -1,6 +1,6 @@
 """Unittests for utils class."""
 import unittest
-from scrolltext.utils import CharacterScroller
+from scrolltext.utils import CharacterScroller, parse_int
 
 
 class CharacterScrollTests(unittest.TestCase):
@@ -100,6 +100,24 @@ class CharacterScrollTests(unittest.TestCase):
             cnt += 1
         self.assertTrue(((cnt + len(scroll_text)) // 2) == len(scroll_text))
 
+
+class ParseIntTests(unittest.TestCase):
+    """Test cases for parse int utility"""
+    def test_parse_None_returns_0(self):
+        """Given None returns 0"""
+        self.assertEquals(parse_int(None), 0)
+
+    def test_parse_empty_str_returns_0(self):
+        """Given empty str returns 0"""
+        self.assertEquals(parse_int(""), 0)
+
+    def test_parse_str1_returns_int1(self):
+        """Given "1" returns 1"""
+        self.assertEquals(parse_int("1"), 1)
+
+    def test_parse_str_minus1_returns_int_minus1(self):
+        """Given "-1" returns -1"""
+        self.assertEquals(parse_int("-1"), -1)
 
 if __name__ == '__main__':
     unittest.main()
