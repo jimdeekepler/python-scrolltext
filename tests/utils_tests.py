@@ -105,7 +105,7 @@ class CharacterScrollTests(unittest.TestCase):
 
 class ParseIntTests(unittest.TestCase):
     """Test cases for parse int utility"""
-    def test_parse_None_returns_0(self):
+    def test_parse_none_returns_0(self):
         """Given None returns 0"""
         self.assertEqual(parse_int(None), 0)
 
