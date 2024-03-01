@@ -6,7 +6,7 @@ from os import getenv
 import curses
 import logging
 from .utils import (CharacterScroller,
-                    get_linenum, SCROLL_TEXT)
+                    get_linenum, SCROLL_TEXT, scroll_direction)
 
 TRUE_CHARACTERS = ["1", "y", "yes"]
 BOX = getenv("SCROLL_BOX")
@@ -42,7 +42,7 @@ def curses_scroller(win):
     line = get_linenum(3, visibile_height - (1 if BOX else 0))
     log.debug("screenline %d", line)
     scroller = CharacterScroller(visibile_text_length,
-                                 visibile_text_length, SCROLL_TEXT)
+                                 visibile_text_length, SCROLL_TEXT, scroll_direction)
     win.addstr(1, 10, "Scroll-Text")
     add_quit_text(win, line, visibile_height)
     win.timeout(125)
