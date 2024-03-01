@@ -21,6 +21,7 @@ def parse_int(var):
     Calls int on var, ignores TypeError and ValueError.
 
     :returns: Integer value given in var string, 0 if one of the forementioned errors occurs.
+    :rtype: int
     """
     try:
         value = int(var)
