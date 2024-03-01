@@ -66,6 +66,40 @@ class CharacterScrollTests(unittest.TestCase):
             cnt += 1
         self.assertEqual(cnt, len(scroll_text) + 2)
 
+    def test_scroll_character_for_character_right_to_left2(self):
+        """"Right-to-Left text. Test with visibile window size set to 1, or character by
+        character respectively."""
+        scroll_text_list = list("Hello, world")
+        scroll_text_list.reverse()
+        scroll_text = "".join(scroll_text_list)
+        print("orig", scroll_text)
+        expected = list(scroll_text)
+        print("copy", expected)
+        cnt = 0
+        for text in CharacterScroller(1, 0, scroll_text, 1):
+            print("round", str(cnt))
+            try:
+                self.assertEqual(expected[cnt], text)
+            except IndexError:
+                pass
+            cnt += 1
+        self.assertTrue(((cnt + len(scroll_text)) // 2) == len(scroll_text))
+
+    def test_scroll_character_for_character_right_to_left(self):
+        """"Right-to-Left text. Test with visibile window size set to 1, or character by
+        character respectively."""
+        scroll_text = "مرحباً فيلت"
+        expected = list(scroll_text)
+        cnt = 0
+        for text in CharacterScroller(1, 0, scroll_text, 1):
+            print("round", str(cnt), " ", text)
+            try:
+                self.assertEqual(expected[cnt], text)
+            except IndexError:
+                pass
+            cnt += 1
+        self.assertTrue(((cnt + len(scroll_text)) // 2) == len(scroll_text))
+
 
 if __name__ == '__main__':
     unittest.main()
