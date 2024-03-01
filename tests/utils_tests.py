@@ -74,6 +74,7 @@ class CharacterScrollTests(unittest.TestCase):
         scroll_text = "".join(scroll_text_list)
         print("orig", scroll_text)
         expected = list(scroll_text)
+        expected.reverse()
         print("copy", expected)
         cnt = 0
         for text in CharacterScroller(1, 0, scroll_text, 1):
@@ -90,6 +91,7 @@ class CharacterScrollTests(unittest.TestCase):
         character respectively."""
         scroll_text = "مرحباً فيلت"
         expected = list(scroll_text)
+        expected.reverse()
         cnt = 0
         for text in CharacterScroller(1, 0, scroll_text, 1):
             print("round", str(cnt), " ", text)
