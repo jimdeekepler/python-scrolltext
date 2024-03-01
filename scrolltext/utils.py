@@ -11,6 +11,7 @@ HOME = "\033[H"
 DEF_SCROLL_TEXT = """\
 Hello, this is a  classic side scrolling text. You can override it by setting the \
 environment variable 'SCROLL_TEXT'. It is supposed to be a simple example."""
+SCROLL_DIRECTION = getenv("SCROLL_DIRECTION") or "0"
 SCROLL_TEXT = getenv("SCROLL_TEXT") or DEF_SCROLL_TEXT
 SCROLL_LINE_STR = getenv("SCROLL_LINE") or "0"
 
@@ -27,6 +28,9 @@ def parse_int(var):
     except (TypeError, ValueError):
         pass
     return value
+
+
+scroll_direction = parse_int(SCROLL_DIRECTION)
 
 
 def get_linenum(min_row, max_row):
@@ -63,12 +67,23 @@ class CharacterScroller:
         :type args[1]: int
         :param args[2]: The text to scroll
         :type args[2]: str
+        :param args[3]: Direction to scroll [0 left-to-right, 1 right-to-left], if missing,
+                        left-to-right is used.
+        :type args[3]: integer
         """
         self.visible_text_length = int(args[0])
         self.blanks = int(args[1]) * " "
         self.complete_text = self.blanks + args[2] + self.blanks
-        self.pos = 0
-        self.terminal_pos = len(self.complete_text)
+        if len(args) < 4:
+            self.right_to_left = False
+        else:
+            self.right_to_left = parse_int(args[3]) == 1
+        if not self.right_to_left:
+            self.pos = 0
+            self.terminal_pos = len(self.complete_text)
+        else:
+            self.pos = len(self.complete_text)
+            self.terminal_pos = -1
 
     def __iter__(self):
         return iter(self.next, None)
@@ -80,9 +95,36 @@ class CharacterScroller:
         :returns: A str object of visible text length
         :rtype: str
         """
+        if not self.right_to_left:
+            return self._next_left_to_right()
+        return self._next_right_to_left()
+
+    def _next_left_to_right(self):
+        """
+        Gives the next visible text to display by the client-program.
+        Left-to-right reading text
+
+        :returns: A str object of visible text length
+        :rtype: str
+        """
         if self.pos == self.terminal_pos:
             return None
         end = self.pos + self.visible_text_length
         win_text = self.complete_text[self.pos:end]
         self.pos += 1
+        return win_text
+
+    def _next_right_to_left(self):
+        """
+        Gives the next visible text to display by the client-program.
+        Right-to-left reading text
+
+        :returns: A str object of visible text length
+        :rtype: str
+        """
+        if self.pos == self.terminal_pos:
+            return None
+        start = self.pos - self.visible_text_length
+        win_text = self.complete_text[start:self.pos]
+        self.pos -= 1
         return win_text
