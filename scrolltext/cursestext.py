@@ -45,7 +45,7 @@ def curses_scroller(win):
                                  SCROLL_TEXT, scroll_direction, scrollspeedsec)
     win.addstr(1, 10, "Scroll-Text")
     add_quit_text(win, line, visibile_height)
-    win.timeout(125)
+    win.timeout(100)
     try:
         do_textloop(win, scroller, line, visibile_height)
     except RuntimeError:  # NOTE: This may never be raised. Consider removal
