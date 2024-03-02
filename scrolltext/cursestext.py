@@ -32,6 +32,7 @@ def curses_scroller(win):
     :param win: Internal curses based object
     :type win: curses._window
     """
+    scrollspeedsec = .0675
     if BOX:
         win.box()
     curses.curs_set(0)  # Hide the cursor
