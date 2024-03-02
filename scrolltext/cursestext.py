@@ -6,7 +6,7 @@ from os import getenv
 import curses
 import logging
 from .utils import (CharacterScroller,
-                    get_linenum, SCROLL_TEXT, scroll_direction)
+                    get_linenum, SCROLL_TEXT, scroll_direction, scrollspeedsec)
 
 TRUE_CHARACTERS = ["1", "y", "yes"]
 BOX = getenv("SCROLL_BOX")
@@ -32,7 +32,6 @@ def curses_scroller(win):
     :param win: Internal curses based object
     :type win: curses._window
     """
-    scrollspeedsec = .0675
     if BOX:
         win.box()
     curses.curs_set(0)  # Hide the cursor
@@ -42,11 +41,21 @@ def curses_scroller(win):
     log.debug("win dimensions: (%d, %d)", visibile_text_length, visibile_height)
     line = get_linenum(3, visibile_height - (1 if BOX else 0))
     log.debug("screenline %d", line)
-    scroller = CharacterScroller(visibile_text_length,
-                                 visibile_text_length, SCROLL_TEXT, scroll_direction)
+    scroller = CharacterScroller(visibile_text_length, visibile_text_length,
+                                 SCROLL_TEXT, scroll_direction, scrollspeedsec)
     win.addstr(1, 10, "Scroll-Text")
     add_quit_text(win, line, visibile_height)
     win.timeout(125)
+    try:
+        do_textloop(win, scroller, line, visibile_height)
+    except RuntimeError:  # NOTE: This may never be raised. Consider removal
+        log.exception("Exception", exc_info=True)
+
+
+def do_textloop(win, scroller, line, visibile_height):
+    """
+    This method loops over the scrolled text
+    """
     for text in scroller:
         win_text = text
         if not BOX and line == visibile_height:
