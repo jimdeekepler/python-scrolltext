@@ -2,6 +2,7 @@
 Utilities for line-based text scrollers.
 """
 from os import getenv
+from time import time
 
 
 CLEAR = "\033[2J"
@@ -12,8 +13,10 @@ DEF_SCROLL_TEXT = """\
 Hello, this is a  classic side scrolling text. You can override it by setting the \
 environment variable 'SCROLL_TEXT'. It is supposed to be a simple example."""
 SCROLL_DIRECTION = getenv("SCROLL_DIRECTION") or "0"
+SCROLL_SPEEDS = [.5, .25, .125, .075, .0675, .05, .03333333333, .025, .0125]
 SCROLL_TEXT = getenv("SCROLL_TEXT") or DEF_SCROLL_TEXT
 SCROLL_LINE_STR = getenv("SCROLL_LINE") or "0"
+SCROLL_SPEED = getenv("SCROLL_SPEED") or "0"
 
 
 def parse_int(var):
@@ -32,6 +35,11 @@ def parse_int(var):
 
 
 scroll_direction = parse_int(SCROLL_DIRECTION)
+speed_index = parse_int(SCROLL_SPEED)
+if speed_index < 0 or speed_index >= len(SCROLL_SPEEDS):
+    speed_index = 0  # pylint: disable=C0103  # ignores (invalid-name)
+scrollspeedsec = SCROLL_SPEEDS[speed_index]
+del speed_index
 
 
 def get_linenum(min_row, max_row):
@@ -54,7 +62,7 @@ def get_linenum(min_row, max_row):
     return line
 
 
-class CharacterScroller:
+class CharacterScroller:  # pylint: disable=R0902  # ignores (too-many-instance-attributes)
     """
     Utility class  for all character based text-scrollers.
     """
@@ -71,20 +79,34 @@ class CharacterScroller:
         :param args[3]: Direction to scroll [0 left-to-right, 1 right-to-left], if missing,
                         left-to-right is used.
         :type args[3]: integer
+        :param args[4]: Scrolling Speed in seconds
+        :type args[4]: float
         """
         self.visible_text_length = int(args[0])
         self.blanks = int(args[1]) * " "
         self.complete_text = self.blanks + args[2] + self.blanks
-        if len(args) < 4:
-            self.right_to_left = False
-        else:
+        self.pos = 0
+        self.terminal_pos = len(self.complete_text)
+        if len(args) >= 4:
             self.right_to_left = parse_int(args[3]) == 1
+        else:
+            self.right_to_left = False
+        if len(args) >= 5:
+            self.scrollspeedsec = args[4]
+        else:
+            self.scrollspeedsec = .25
         if not self.right_to_left:
             self.pos = 0
             self.terminal_pos = len(self.complete_text)
+            self._pos_real = 0.
+            self._last_pos = 0
         else:
             self.pos = len(self.complete_text)
             self.terminal_pos = -1
+            self._pos_real = float(self.pos)
+            self._last_pos = self.pos
+        self.last_time = time()
+        self._text = self.complete_text
 
     def __iter__(self):
         return iter(self.next, None)
@@ -108,12 +130,23 @@ class CharacterScroller:
         :returns: A str object of visible text length
         :rtype: str
         """
-        if self.pos == self.terminal_pos:
+        if self.pos >= self.terminal_pos:
             return None
         end = self.pos + self.visible_text_length
         win_text = self.complete_text[self.pos:end]
-        self.pos += 1
-        return win_text
+        if self.scrollspeedsec == 0:  # Special case for tests
+            self.pos += 1
+            return win_text
+        time_now = time()
+        delta = time_now - self.last_time
+        self.last_time = time_now
+        offset = delta / self.scrollspeedsec
+        self._pos_real += offset
+        if int(self._pos_real) != self._last_pos:
+            self.pos = int(self._pos_real)
+            self._last_pos = self.pos
+        self._text = win_text
+        return self._text
 
     def _next_right_to_left(self):
         """
@@ -123,9 +156,20 @@ class CharacterScroller:
         :returns: A str object of visible text length
         :rtype: str
         """
-        if self.pos == self.terminal_pos:
+        if self.pos <= self.terminal_pos:
             return None
         start = self.pos - self.visible_text_length
         win_text = self.complete_text[start:self.pos]
-        self.pos -= 1
-        return win_text
+        if self.scrollspeedsec == 0:  # Special case for tests
+            self.pos -= 1
+            return win_text
+        time_now = time()
+        delta = time_now - self.last_time
+        self.last_time = time_now
+        offset = delta / self.scrollspeedsec
+        self._pos_real -= offset
+        if int(self._pos_real) != self._last_pos:
+            self.pos = int(self._pos_real)
+            self._last_pos = self.pos
+        self._text = win_text
+        return self._text

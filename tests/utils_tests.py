@@ -15,7 +15,7 @@ class CharacterScrollTests(unittest.TestCase):
         """"Test with visibile window size set to 0."""
         cnt = 0
         scroll_text = "Hello, world"
-        for text in CharacterScroller(0, 1, scroll_text):
+        for text in CharacterScroller(0, 1, scroll_text, 0, 0):
             self.assertEqual("", text)
             cnt += 1
         self.assertEqual(cnt, len(scroll_text) + 2)
@@ -26,7 +26,7 @@ class CharacterScrollTests(unittest.TestCase):
         scroll_text = "Hello, world"
         expected = list(scroll_text)
         cnt = 0
-        for text in CharacterScroller(1, 0, scroll_text):
+        for text in CharacterScroller(1, 0, scroll_text, 0, 0):
             self.assertEqual(expected[cnt], text)
             cnt += 1
         self.assertEqual(cnt, len(scroll_text))
@@ -38,7 +38,7 @@ class CharacterScrollTests(unittest.TestCase):
         scroll_text2 = " " + scroll_text + " "
         expected = list(scroll_text2)
         cnt = 0
-        for text in CharacterScroller(1, 1, scroll_text):
+        for text in CharacterScroller(1, 1, scroll_text, 0, 0):
             self.assertEqual(expected[cnt], text)
             cnt += 1
         self.assertEqual(cnt, len(scroll_text) + 2)
@@ -49,7 +49,7 @@ class CharacterScrollTests(unittest.TestCase):
         expected = [" H", "He", "el", "ll", "lo", "o,", ", ", " w", "wo", "or",
                     "rl", "ld", "d ", " "]
         cnt = 0
-        for text in CharacterScroller(2, 1, scroll_text):
+        for text in CharacterScroller(2, 1, scroll_text, 0, 0):
             self.assertEqual(expected[cnt], text)
             cnt += 1
         self.assertEqual(cnt, len(scroll_text) + 2)
@@ -61,7 +61,7 @@ class CharacterScrollTests(unittest.TestCase):
                     "lo, world ", "o, world ", ", world ", " world ", "world ",
                     "orld ", "rld ", "ld ", "d ", " "]
         cnt = 0
-        for text in CharacterScroller(80, 1, scroll_text):
+        for text in CharacterScroller(80, 1, scroll_text, 0, 0):
             self.assertEqual(expected[cnt], text)
             cnt += 1
         self.assertEqual(cnt, len(scroll_text) + 2)
@@ -77,7 +77,7 @@ class CharacterScrollTests(unittest.TestCase):
         expected.reverse()
         print("copy", expected)
         cnt = 0
-        for text in CharacterScroller(1, 0, scroll_text, 1):
+        for text in CharacterScroller(1, 0, scroll_text, 1, 0):
             print("round", str(cnt))
             try:
                 self.assertEqual(expected[cnt], text)
@@ -93,7 +93,7 @@ class CharacterScrollTests(unittest.TestCase):
         expected = list(scroll_text)
         expected.reverse()
         cnt = 0
-        for text in CharacterScroller(1, 0, scroll_text, 1):
+        for text in CharacterScroller(1, 0, scroll_text, 1, 0):
             print("round", str(cnt), " ", text)
             try:
                 self.assertEqual(expected[cnt], text)
