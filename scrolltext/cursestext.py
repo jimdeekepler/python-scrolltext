@@ -64,7 +64,6 @@ def do_textloop(win, scroller, line, visibile_height):
         win.redrawwin()
         if check_quit(win):
             return
-        win.redrawwin()
 
 
 def add_quit_text(win, line, visibile_height):
