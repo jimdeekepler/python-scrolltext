@@ -13,7 +13,7 @@ DEF_SCROLL_TEXT = """\
 Hello, this is a  classic side scrolling text. You can override it by setting the \
 environment variable 'SCROLL_TEXT'. It is supposed to be a simple example."""
 SCROLL_DIRECTION = getenv("SCROLL_DIRECTION") or "0"
-SCROLL_SPEEDS = [.5, .25, .125, .075, .0675, .05, .03333333333, .025, .0125]
+SCROLL_SPEEDS = [.25, .20, .18, .15, .125, .1, .09, .08, .075, .07, .0675]
 SCROLL_TEXT = getenv("SCROLL_TEXT") or DEF_SCROLL_TEXT
 SCROLL_LINE_STR = getenv("SCROLL_LINE") or "0"
 SCROLL_SPEED = getenv("SCROLL_SPEED") or "0"
@@ -37,7 +37,7 @@ def parse_int(var):
 scroll_direction = parse_int(SCROLL_DIRECTION)
 speed_index = parse_int(SCROLL_SPEED)
 if speed_index < 0 or speed_index >= len(SCROLL_SPEEDS):
-    speed_index = 0  # pylint: disable=C0103  # ignores (invalid-name)
+    speed_index = 4  # pylint: disable=C0103  # ignores (invalid-name)
 scrollspeedsec = SCROLL_SPEEDS[speed_index]
 del speed_index
 
