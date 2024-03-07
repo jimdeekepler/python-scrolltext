@@ -44,3 +44,19 @@ or
 
 Using `SCROLL_DIRECTION=1` makes the text start scrolling from left-side of the terminal.
 This is used for right-to-left writing languages.
+
+
+### Using a different scrolling speed
+
+The scrolling speed can be altered by setting the environment variable `SCROLL_SPEED`
+There are 10 different speeds available. These can be selected by choosing a
+number between 0 and 9.
+
+Slow scrolling speed (default, if not set)
+
+    SCROLL_SPEED=0 scrolltext
+
+
+Fastest scrolling speed.
+
+    SCROLL_SPEED=10 scrolltext
