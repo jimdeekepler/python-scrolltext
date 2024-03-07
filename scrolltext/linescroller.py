@@ -51,7 +51,6 @@ def _linescroller(getch):
         print(f"{UP_ONE_ROW}", end="")
 
 
-
 def _check_input(getch):
     """
     Use getchtimeout to get a character. If "Q" or "q" is given, then it raises SystemExit
