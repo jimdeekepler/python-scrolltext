@@ -5,7 +5,7 @@ from curses import wrapper, error
 from os import getenv
 import curses
 import logging
-from .utils import (CharacterScroller,
+from .utils import (CharacterScroller, IS_WINDOWS,
                     get_linenum, SCROLL_TEXT, scroll_direction, scrollspeedsec)
 
 TRUE_CHARACTERS = ["1", "y", "yes"]
@@ -34,7 +34,8 @@ def curses_scroller(win):
     """
     if BOX:
         win.box()
-    curses.curs_set(0)  # Hide the cursor
+    if not IS_WINDOWS:
+        curses.curs_set(0)  # Hide the cursor
     winsize = win.getmaxyx()
     visibile_height = winsize[0] - 1
     visibile_text_length = winsize[1] - (2 if BOX else 0)

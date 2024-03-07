@@ -2,13 +2,11 @@
 A simple side scrolling text application.
 """
 import shutil
-import sys
 from time import sleep
-from .utils import (CLEAR, HOME, CharacterScroller, get_linenum, SCROLL_TEXT, scroll_direction,
-                    scrollspeedsec)
+from .utils import (CLEAR, HOME, IS_WINDOWS, UP_ONE_ROW, CharacterScroller, get_linenum,
+                    SCROLL_TEXT, scroll_direction, scrollspeedsec)
 
 
-IS_WINDOWS = sys.platform in ["msys", "win32", "nt"]
 if not IS_WINDOWS:
     from .getchtimeout import GetchWithTimeout
 
@@ -39,7 +37,7 @@ def _linescroller(getch):
     print(f"{CLEAR}{HOME}", end="")
     line = get_linenum(0,  shutil.get_terminal_size()[1])
     if line > 0:
-        print(f"\033[{line}B", end="")
+        _move_to_line(line)
     scroller = CharacterScroller(VISIBILE_TEXT_LENGTH, VISIBILE_TEXT_LENGTH,
                                  SCROLL_TEXT, scroll_direction, scrollspeedsec)
     for text in scroller:
@@ -49,6 +47,9 @@ def _linescroller(getch):
             sleep(.15)
         else:
             _check_input(getch)
+    if IS_WINDOWS:
+        print(f"{UP_ONE_ROW}", end="")
+
 
 
 def _check_input(getch):
@@ -58,6 +59,19 @@ def _check_input(getch):
     character = getch.getch(timeout=.1)
     if character is not None and character in ["\033", "\x1b", "", "\r", "", " ", "Q", "q"]:
         raise RuntimeError()
+
+
+def _move_to_line(line):
+    """
+    Move the cursor to the specified line. This is done using ANSI Escape sequences.
+    :param line: The line number to scroll to.
+    :type line: int
+    """
+    if not IS_WINDOWS:
+        print(f"\033[{line}B", end="")
+    else:
+        for _ in range(line):
+            print("\033[1B", end="")
 
 
 if __name__ == "__main__":

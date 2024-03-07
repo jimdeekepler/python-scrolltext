@@ -1,14 +1,17 @@
 """
 Utilities for line-based text scrollers.
 """
+import sys
 from os import getenv
 from time import time
 
 
 CLEAR = "\033[2J"
 HOME = "\033[H"
+UP_ONE_ROW = "\033[1A"
 
 
+IS_WINDOWS = sys.platform in ["msys", "win32", "nt"]
 DEF_SCROLL_TEXT = """\
 Hello, this is a  classic side scrolling text. You can override it by setting the \
 environment variable 'SCROLL_TEXT'. It is supposed to be a simple example."""
