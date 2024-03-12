@@ -99,7 +99,3 @@ def main():
         log.exception(ex)
     finally:
         log.debug("end")
-
-
-if __name__ == "__main__":
-    main()
