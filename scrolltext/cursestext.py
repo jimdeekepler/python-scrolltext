@@ -2,79 +2,74 @@
 A simple curses-based side scrolling text application.
 """
 from curses import wrapper, error
-from os import getenv
 import curses
 import logging
-from .utils import (CharacterScroller, IS_WINDOWS,
-                    get_linenum, SCROLL_TEXT, scroll_direction, scrollspeedsec)
+from .utils import CharacterScroller, IS_WINDOWS, init_utils
 
-TRUE_CHARACTERS = ["1", "y", "yes"]
-BOX = getenv("SCROLL_BOX")
-if BOX is not None:
-    BOX = BOX in TRUE_CHARACTERS
-else:
-    BOX = True
-VERBOSE = getenv("VERBOSE") in TRUE_CHARACTERS or False
-if VERBOSE:
-    logging.basicConfig(filename="cursesscroller.log", filemode="w", level=logging.DEBUG)
-log = logging.getLogger(__name__)
-
-
-log.debug("start")
 
 QUIT_CHARACTERS = ["\x1B", "Q", "q"]
 
 
-def curses_scroller(win):
+log = logging.getLogger(__name__)
+
+
+def curses_scroller(win, write_config):
     """
     Curses-main: render a text in a side-scrolling manner, using curses.
 
     :param win: Internal curses based object
     :type win: curses._window
+    :param write_config: Write initial config
+    :type: bool
     """
-    if BOX:
+    winsize = win.getmaxyx()
+    log.debug("win dimensions: (columns, rows) (%d, %d)", winsize[1], winsize[0])
+
+    cfg = init_utils(write_config)
+    box = cfg["cursestext"].getboolean("box")
+    # try:
+    if box:
         win.box()
     if not IS_WINDOWS:
         curses.curs_set(0)  # Hide the cursor
-    winsize = win.getmaxyx()
-    visibile_height = winsize[0] - 1
-    visibile_text_length = winsize[1] - (2 if BOX else 0)
-    log.debug("win dimensions: (%d, %d)", visibile_text_length, visibile_height)
-    line = get_linenum(3, visibile_height - (1 if BOX else 0))
-    log.debug("screenline %d", line)
-    scroller = CharacterScroller(visibile_text_length, visibile_text_length,
-                                 SCROLL_TEXT, scroll_direction, scrollspeedsec)
+
+    argv = {}
+    argv["term_rows"] = winsize[0] - (2 if box else 1)
+    argv["term_columns"] = winsize[1] - (2 if box else 0)
+    argv["min_scroll_line"] = 3
+    scroller = CharacterScroller(cfg, **argv)
+
     win.addstr(1, 10, "Scroll-Text")
-    add_quit_text(win, line, visibile_height)
+    add_quit_text(win, box, scroller.line, argv["term_rows"])
     win.timeout(100)
-    try:
-        do_textloop(win, scroller, line, visibile_height)
-    except RuntimeError:  # NOTE: This may never be raised. Consider removal
-        log.exception("Exception", exc_info=True)
+    do_textloop(win, box, scroller, winsize[0])
+    # except RuntimeError:  # NOTE: This may never be raised. Consider removal
+    #     log.exception("Exception", exc_info=True)
 
 
-def do_textloop(win, scroller, line, visibile_height):
+def do_textloop(win, box, scroller, visibile_height):
     """
     This method loops over the scrolled text
     """
     for text in scroller:
         win_text = text
-        if not BOX and line == visibile_height:
+        if not box and scroller.line == visibile_height:
             win_text = text[:-1]
-        win.addstr(line, (1 if BOX else 0), win_text)
+        win.addstr(scroller.line, (1 if box else 0), win_text)
         win.redrawwin()
         if check_quit(win):
             return
 
 
-def add_quit_text(win, line, visibile_height):
+def add_quit_text(win, box, line, visibile_height):
     """
     Adds a hint message to win.
+    TODO: visibile_height, winsize, ...??
     """
-    if not BOX and line == visibile_height:
+    if not box and line == visibile_height:
         win.addstr(visibile_height - 2, 0, " You can quit with 'q' or 'Q'.")
     else:
-        win.addstr(visibile_height, (2 if BOX else 0), " You can quit with 'q' or 'Q'.")
+        win.addstr(visibile_height, (2 if box else 0), " You can quit with 'q' or 'Q'.")
 
 
 def check_quit(win):
@@ -90,11 +85,11 @@ def check_quit(win):
     return False
 
 
-def main():
+def work(write_config):
     """Main usese curses.wrapper. See curses doc for details.
     """
     try:  # noqa: C901 ignoring 'TryExcept 42' is too complex - fix later
-        wrapper(curses_scroller)
+        wrapper(curses_scroller, write_config)
     except error as ex:
         log.exception(ex)
     finally:
