@@ -61,3 +61,19 @@ Slow scrolling speed (default, if not set)
 Fastest scrolling speed.
 
     SCROLL_SPEED=10 scrolltext
+
+
+## Bugs and quirks
+
+ - does not detect term-resize
+ - no colors
+
+
+## Changes
+
+### v0.0.8
+
+ - doc-comments have never been generated, nor are those validated. (TODO)
+ - renamed log-file to "scrolltext.log"
+ - uses config file "scrolltextrc"
+   \*NIX uses "~/.config/scrolltextrc", windows uses "scrolltextrc" in current directory
