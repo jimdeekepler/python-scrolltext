@@ -1,4 +1,5 @@
 [![Python application](https://github.com/jimdeekepler/python-scrolltext/actions/workflows/python-app.yml/badge.svg)](https://github.com/jimdeekepler/python-scrolltext/actions/workflows/python-app.yml)
+[![PyPI version](https://img.shields.io/pypi/v/scrolltext.svg)](https://pypi.org/project/scrolltext/)
 
 
 ## python-scrolltext
