@@ -1,9 +1,11 @@
 """
 Utilities for line-based text scrollers.
 """
-import sys
+import logging
 from os import getenv
 from time import time
+from scrolltext.config import get_speedsec_float, init_config
+from scrolltext.config import IS_WINDOWS  # pylint: disable=no-name-in-module (W0611)
 
 
 CLEAR = "\033[2J"
@@ -11,15 +13,7 @@ HOME = "\033[H"
 UP_ONE_ROW = "\033[1A"
 
 
-IS_WINDOWS = sys.platform in ["msys", "win32", "nt"]
-DEF_SCROLL_TEXT = """\
-Hello, this is a  classic side scrolling text. You can override it by setting the \
-environment variable 'SCROLL_TEXT'. It is supposed to be a simple example."""
-SCROLL_DIRECTION = getenv("SCROLL_DIRECTION") or "0"
-SCROLL_SPEEDS = [.25, .20, .18, .15, .125, .1, .09, .08, .075, .07, .0675]
-SCROLL_TEXT = getenv("SCROLL_TEXT") or DEF_SCROLL_TEXT
-SCROLL_LINE_STR = getenv("SCROLL_LINE") or "0"
-SCROLL_SPEED = getenv("SCROLL_SPEED") or "0"
+log = logging.getLogger(__name__)
 
 
 def parse_int(var):
@@ -37,16 +31,23 @@ def parse_int(var):
     return 0
 
 
-scroll_direction = parse_int(SCROLL_DIRECTION)
-speed_index = parse_int(SCROLL_SPEED)
-if speed_index < 0 or speed_index >= len(SCROLL_SPEEDS):
-    speed_index = 4  # pylint: disable=C0103  # ignores (invalid-name)
-scrollspeedsec = SCROLL_SPEEDS[speed_index]
-del speed_index
-
-
-def get_linenum(min_row, max_row):
+def init_utils(write_config):
     """
+    Initialises config object and updates some configs via environment varialbes, if
+    set.
+    :param write_config: Write initial config
+    :type: bool
+    """
+    cfg = init_config(write_config)
+    _override_from_env(cfg)
+    _init_logging(cfg)
+    return cfg
+
+
+def get_linenum(scroll_line_str, min_row, max_row):
+    """
+    :param scroll_line_str: Terminal line number for one scrolling text
+    :type scroll_line_str: str
     :param min_row: Minimum line number
     :type min_row: int
     :param max_row: Maximum line number
@@ -55,7 +56,7 @@ def get_linenum(min_row, max_row):
     """
     line = min_row
     try:
-        line = int(SCROLL_LINE_STR)
+        line = int(scroll_line_str)
     except (TypeError, ValueError):
         pass
     if line < 0:
@@ -65,39 +66,95 @@ def get_linenum(min_row, max_row):
     return line
 
 
-class CharacterScroller:  # pylint: disable=R0902  # ignores (too-many-instance-attributes)
+def _init_logging(cfg):
+    verbose = cfg["main"].getboolean("verbose")
+    if verbose:
+        # logging.basicConfig(filename="cursesscroller.log", filemode="w", level=logging.DEBUG)
+        logging.basicConfig(filename="scrolltext.log", filemode="w", level=logging.DEBUG)
+
+
+def _override_from_env(cfg):
+    _override_verbose(cfg)  # x x x  todo: recap (all of those ...)
+    _override_scroll_direction(cfg)
+    _override_scroll_text(cfg)
+    _override_scroll_line(cfg)
+    _override_scroll_speed(cfg)
+
+
+def _override_verbose(cfg):
+    verbose = getenv("VERBOSE") == "1"
+    if verbose:
+        log.debug("Using env-var 'VERBOSE'")
+        cfg["main"]["verbose"] = "1"
+
+
+def _override_scroll_direction(cfg):
+    scroll_direction = getenv("SCROLL_DIRECTION") == "1"
+    if scroll_direction:
+        log.debug("Using env-var 'SCROLL_DIRECTION'")
+        cfg["scrolltext.text 1"]["direction"] = "1"
+
+
+def _override_scroll_text(cfg):
+    scroll_text = getenv("SCROLL_TEXT")
+    if scroll_text:
+        log.debug("Using env-var 'SCROLL_TEXT'")
+        cfg["scrolltext.text 1"]["text"] = scroll_text
+
+
+def _override_scroll_line(cfg):
+    scroll_line_str = getenv("SCROLL_LINE")
+    if scroll_line_str:
+        log.debug("Using env-var 'SCROLL_LINE_STR'")
+        cfg["scrolltext.text 1"]["line"] = scroll_line_str
+
+
+def _override_scroll_speed(cfg):
+    scroll_speed = getenv("SCROLL_SPEED")
+    if scroll_speed:
+        scroll_speed_index = parse_int(getenv("SCROLL_SPEED"))
+        log.debug("Using env-var 'SCROLL_SPEED' with '%s'", scroll_speed)
+        cfg["scrolltext.text 1"]["speed"] = str(scroll_speed_index)
+
+
+class CharacterScroller:  # pylint: disable=R0902  # disable (too-many-instance-attributes)
     """
     Utility class  for all character based text-scrollers.
     """
 
-    def __init__(self, *args):
+    def __init__(self, cfg, **argv):
         """Objects init method.
-        :param args[0]: The number of characters of visible text, e.g. terminal width, number
-                        of columns
-        :type args[0]: int
-        :param args[1]: The number of leading and trailing blank characters to add
-        :type args[1]: int
-        :param args[2]: The text to scroll
-        :type args[2]: str
-        :param args[3]: Direction to scroll [0 left-to-right, 1 right-to-left], if missing,
-                        left-to-right is used.
-        :type args[3]: integer
-        :param args[4]: Scrolling Speed in seconds
-        :type args[4]: float
+        :param cfg: Configuration dictionary
+        :type: configparser.ConfigParser
+        :param argv["section_index"]: Number of scrolltext.text section in use [1..3]
+        :param argv["term_rows"]: Terminal height in number of rows
+        :param argv["term_columns"]: Terminal width in number of columns
+        :param argv["min_scroll_line"]: The minimum terminal row allowed
+        :param argv["test"]: Only used in unittests
         """
-        self.visible_text_length = int(args[0])
-        self.blanks = int(args[1]) * " "
-        self.complete_text = self.blanks + args[2] + self.blanks
+        self.visible_text_length = argv["term_columns"]
+
+        section_index = str(argv["section_index"]) if "section_index" in argv else "1"
+        str_section = "scrolltext.text " + section_index
+        scroll_text = cfg[str_section]["text"]
+        scroll_line_str = cfg[str_section]["line"]
+        scroll_direction = cfg[str_section].getboolean("direction")
+
+        self.line = get_linenum(scroll_line_str, argv["min_scroll_line"], argv["term_rows"])
+        log.debug("screenline %d", self.line)
+        log.debug("scrolltext length: %d", len(scroll_text))
+        log.debug("scrolltext part: >> %s <<", scroll_text[20:100])
+
+        num_blanks = argv["blanks"] if "blanks" in argv else self.visible_text_length
+        self.blanks = num_blanks * " "
+        self.complete_text = self.blanks + scroll_text + self.blanks
         self.pos = 0
         self.terminal_pos = len(self.complete_text)
-        if len(args) >= 4:
-            self.right_to_left = parse_int(args[3]) == 1
+        self.right_to_left = scroll_direction
+        if "test" in argv:
+            self.scrollspeedsec = 0
         else:
-            self.right_to_left = False
-        if len(args) >= 5:
-            self.scrollspeedsec = args[4]
-        else:
-            self.scrollspeedsec = .25
+            self.scrollspeedsec = get_speedsec_float(cfg[str_section].getint("speed"))
         if not self.right_to_left:
             self.pos = 0
             self.terminal_pos = len(self.complete_text)
