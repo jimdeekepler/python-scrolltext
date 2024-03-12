@@ -39,9 +39,9 @@ jobs:
         # exit-zero treats all errors as warnings. The GitHub editor is 127 chars wide
         #flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
         PYTHONPATH=. flake8 . --count --exit-zero --max-complexity=5 --max-line-length=100 --statistics \
-	           --per-file-ignores="scrolltext/utils.py:F401 scrolltext/cli.py:C901"  # see below
-	# --per-file-ignores="scrolltext/utils.py:F401"  # F401 import but never used (IS_WINDOWS)
-	# --per-file-ignores="scrolltext/cli.py:C901"    # C901 _parse_args is too comples
+                     --per-file-ignores="scrolltext/utils.py:F401 scrolltext/cli.py:C901"  # see below
+        # --per-file-ignores="scrolltext/utils.py:F401"  # F401 import but never used (IS_WINDOWS)
+        # --per-file-ignores="scrolltext/cli.py:C901"    # C901 _parse_args is too comples
     - name: Unittests
       run: |
         PYTHONPATH=. python tests/utils_tests.py
