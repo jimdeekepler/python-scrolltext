@@ -7,28 +7,55 @@ from scrolltext import linescroller
 from scrolltext.utils import init_utils
 
 
+HELP = """\
+scrolltext [-w|--write] action
+
+    -w|--write  write initial config
+
+    action      cursestext or linescroller
+
+"""
+VERSION = "scrolltext v0.0.8"  # possible improvement: use importlib metadata?
+
+
 def main():
     """
     Main method.
     """
-    action = _parse_args()
+    write_config, action = _parse_args()
     try:
-        cfg = init_utils(False)
+        cfg = init_utils(write_config)
         action = action or _str_to_action_type(cfg["main"]["action"])
-        action(False)
+        action(write_config)
     except NameError as e:
         print("NameError occured: " + str(e))
         print("Probalby check config?")
 
 
 def _parse_args():  # pylint: disable=inconsistent-return-statements  (R1710)
+    write_config = False
     action = None
     for arg in sys.argv[1:]:
-        if "cursestext" == arg:
+        if _check_help_or_version(arg):
+            sys.exit(0)
+
+        if arg in ["-w", "--write"]:
+            write_config = True
+        elif "cursestext" == arg:
             action = cursesscroller
         elif "linescroller" == arg:
             action = linescroller
-    return action
+    return write_config, action
+
+
+def _check_help_or_version(arg):
+    if arg in ["-h", "--help"]:
+        print(HELP)
+        return True
+    if arg in ["-v", "--version"]:
+        print(VERSION)
+        return True
+    return False
 
 
 def _str_to_action_type(action):
