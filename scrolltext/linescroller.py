@@ -71,7 +71,3 @@ def _move_to_line(line):
     else:
         for _ in range(line):
             print("\033[1B", end="")
-
-
-if __name__ == "__main__":
-    linescroller()
