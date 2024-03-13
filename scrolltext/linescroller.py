@@ -37,7 +37,7 @@ def _linescroller(getch, write_config):
     cfg = init_utils(write_config)
     argv = {}
     argv["term_rows"] = shutil.get_terminal_size()[1]
-    argv["term_columns"] = shutil.get_terminal_size()[0]
+    argv["term_columns"] = shutil.get_terminal_size()[0] - (1 if IS_WINDOWS else 0)
     argv["min_scroll_line"] = 0
     scroller = CharacterScroller(cfg, **argv)
 
