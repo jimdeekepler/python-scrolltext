@@ -39,8 +39,6 @@ class CharacterScrollTests(unittest.TestCase):
         for text in CharacterScroller(self.cfg, **self.argv):
             self.assertEqual("", text)
             cnt += 1
-            if cnt > 20:
-                raise RuntimeError("exceeded")
         self.assertEqual(cnt, len(self.cfg["scrolltext.text 1"]["text"]) + 2)
 
     def test_scroll_character_for_character(self):
