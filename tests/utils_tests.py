@@ -119,7 +119,6 @@ class CharacterScrollTests(unittest.TestCase):
         expected = list(scroll_text)
         cnt = 0
         for text in CharacterScroller(self.cfg, **self.argv):  # 1, 0, scroll_text, 1, 0):
-            print("round", str(cnt))
             try:
                 self.assertEqual(expected[cnt], text)
             except IndexError:
@@ -139,7 +138,6 @@ class CharacterScrollTests(unittest.TestCase):
         expected.reverse()
         cnt = 0
         for text in CharacterScroller(self.cfg, **self.argv):  # 1, 0, scroll_text, 1, 0):
-            print("round", str(cnt), " ", text)
             try:
                 self.assertEqual(expected[cnt], text)
             except IndexError:
