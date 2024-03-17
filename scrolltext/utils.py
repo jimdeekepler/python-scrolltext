@@ -75,6 +75,7 @@ def _init_logging(cfg):
 
 def _override_from_env(cfg):
     _override_verbose(cfg)  # x x x  todo: recap (all of those ...)
+    _override_scroll_box(cfg)
     _override_scroll_direction(cfg)
     _override_scroll_text(cfg)
     _override_scroll_line(cfg)
@@ -86,6 +87,13 @@ def _override_verbose(cfg):
     if verbose:
         log.debug("Using env-var 'VERBOSE'")
         cfg["main"]["verbose"] = "1"
+
+
+def _override_scroll_box(cfg):
+    scroll_direction = getenv("SCROLL_BOX") == "1"
+    if scroll_direction:
+        log.debug("Using env-var 'SCROLL_BOX'")
+        cfg["cursestext"]["box"] = "1"
 
 
 def _override_scroll_direction(cfg):
