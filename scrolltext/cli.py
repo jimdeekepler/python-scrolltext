@@ -27,9 +27,11 @@ def main():
         cfg = init_utils(write_config)
         action = action or _str_to_action_type(cfg["main"]["action"])
         action(write_config)
+    except KeyError as e:
+        print("KeyError occured: " + str(e) + 
+            "\nProbalby check config?")
     except NameError as e:
         print("NameError occured: " + str(e))
-        print("Probalby check config?")
 
 
 def _parse_args():  # pylint: disable=inconsistent-return-statements  (R1710)
