@@ -42,9 +42,10 @@ def curses_scroller(win, write_config):
     win.addstr(1, 10, "Scroll-Text")
     add_quit_text(win, box, scroller.line, argv["term_rows"])
     win.timeout(100)
-    do_textloop(win, box, scroller, winsize[0])
-    # except RuntimeError:  # NOTE: This may never be raised. Consider removal
-    #     log.exception("Exception", exc_info=True)
+    try:
+        do_textloop(win, box, term_size, scroller, term_size.get_rows())
+    except KeyboardInterrupt:
+        pass
 
 
 def do_textloop(win, box, scroller, visibile_height):
