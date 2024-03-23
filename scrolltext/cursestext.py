@@ -43,7 +43,7 @@ def curses_scroller(win, write_config):
     add_quit_text(win, box, scroller.line, argv["term_rows"])
     win.timeout(100)
     try:
-        do_textloop(win, box, term_size, scroller, term_size.get_rows())
+        do_textloop(win, box, scroller, argv["term_rows"])
     except KeyboardInterrupt:
         pass
 
