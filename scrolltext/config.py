@@ -18,7 +18,7 @@ log = logging.getLogger(__name__)
 
 
 initial_config = {
-    "main": {"action": "linescroller"},
+    "main": {"action": "linescroller", "endless": "0"},
     "cursestext": {"box": "1"},
     "scrolltext.text 1": {
         "direction": "0",
