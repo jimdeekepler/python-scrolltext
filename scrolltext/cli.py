@@ -28,8 +28,8 @@ def main():
         action = action or _str_to_action_type(cfg["main"]["action"])
         action(write_config)
     except KeyError as e:
-        print("KeyError occured: " + str(e) + 
-            "\nProbalby check config?")
+        print("KeyError occured: " + str(e) +
+              "\nProbalby check config?")
     except NameError as e:
         print("NameError occured: " + str(e))
 
