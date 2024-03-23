@@ -141,6 +141,7 @@ class CharacterScroller:  # pylint: disable=R0902  # disable (too-many-instance-
         :param argv["test"]: Only used in unittests
         """
         self.visible_text_length = argv["term_columns"]
+        self.endless = cfg["main"].getboolean("endless")
 
         section_index = str(argv["section_index"]) if "section_index" in argv else "1"
         str_section = "scrolltext.text " + section_index
@@ -155,24 +156,16 @@ class CharacterScroller:  # pylint: disable=R0902  # disable (too-many-instance-
 
         num_blanks = argv["blanks"] if "blanks" in argv else self.visible_text_length
         self.blanks = num_blanks * " "
-        self.complete_text = self.blanks + scroll_text + self.blanks
+        self.complete_text = self.blanks + scroll_text + (self.blanks if not self.endless else "")
         self.pos = 0
+        self._last_pos = 0
         self.terminal_pos = len(self.complete_text)
         self.right_to_left = scroll_direction
         if "test" in argv:
             self.scrollspeedsec = 0
         else:
             self.scrollspeedsec = get_speedsec_float(cfg[str_section].getint("speed"))
-        if not self.right_to_left:
-            self.pos = 0
-            self.terminal_pos = len(self.complete_text)
-            self._pos_real = 0.
-            self._last_pos = 0
-        else:
-            self.pos = len(self.complete_text)
-            self.terminal_pos = -1
-            self._pos_real = float(self.pos)
-            self._last_pos = self.pos
+        self._set_start_params()
         self.last_time = time()
         self._text = self.complete_text
 
@@ -199,7 +192,9 @@ class CharacterScroller:  # pylint: disable=R0902  # disable (too-many-instance-
         :rtype: str
         """
         if self.pos >= self.terminal_pos:
-            return None
+            if not self.endless:
+                return None
+            self._set_start_params()
         end = self.pos + self.visible_text_length
         win_text = self.complete_text[self.pos:end]
         if self.scrollspeedsec == 0:  # Special case for tests
@@ -225,7 +220,9 @@ class CharacterScroller:  # pylint: disable=R0902  # disable (too-many-instance-
         :rtype: str
         """
         if self.pos <= self.terminal_pos:
-            return None
+            if not self.endless:
+                return None
+            self._set_start_params()
         start = self.pos - self.visible_text_length
         win_text = self.complete_text[start:self.pos]
         if self.scrollspeedsec == 0:  # Special case for tests
@@ -241,3 +238,15 @@ class CharacterScroller:  # pylint: disable=R0902  # disable (too-many-instance-
             self._last_pos = self.pos
         self._text = win_text
         return self._text
+
+    def _set_start_params(self):
+        if not self.right_to_left:
+            self.pos = 0
+            self.terminal_pos = len(self.complete_text)
+            self._pos_real = 0.
+            self._last_pos = 0
+        else:
+            self.pos = len(self.complete_text)
+            self.terminal_pos = -1
+            self._pos_real = float(self.pos)
+            self._last_pos = self.pos
