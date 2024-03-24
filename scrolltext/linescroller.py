@@ -17,8 +17,8 @@ log = logging.getLogger(__name__)
 def linescroller(cfg):
     """
     Main entry point for linescroller.
-    :param write_config: Write initial config
-    :type: bool
+    :param cfg: Config object
+    :type: configparser.ConfigParser
     """
     getch = None
     if not IS_WINDOWS:
