@@ -26,7 +26,7 @@ def main():
     try:
         cfg = init_utils(write_config)
         action = action or _str_to_action_type(cfg["main"]["action"])
-        action(write_config)
+        action(cfg)
     except KeyError as e:
         print("KeyError occured: " + str(e) +
               "\nProbalby check config?")

@@ -3,7 +3,7 @@ A simple side scrolling text application.
 """
 import shutil
 from time import sleep
-from .utils import CLEAR, HOME, IS_WINDOWS, UP_ONE_ROW, CharacterScroller, init_utils
+from .utils import CLEAR, HOME, IS_WINDOWS, UP_ONE_ROW, CharacterScroller
 
 if not IS_WINDOWS:
     from scrolltext.getchtimeout import GetchWithTimeout
@@ -12,17 +12,17 @@ if not IS_WINDOWS:
 VISIBILE_TEXT_LENGTH = shutil.get_terminal_size()[0]
 
 
-def linescroller(write_config):
+def linescroller(cfg):
     """
     Main entry point for linescroller.
-    :param write_config: Write initial config
-    :type: bool
+    :param cfg: Config object
+    :type: configparser.ConfigParser
     """
     getch = None
     if not IS_WINDOWS:
         getch = GetchWithTimeout()
     try:
-        _linescroller(getch, write_config)
+        _linescroller(getch, cfg)
     except RuntimeError:
         pass
     finally:
@@ -30,11 +30,10 @@ def linescroller(write_config):
             getch.cleanup()
 
 
-def _linescroller(getch, write_config):
+def _linescroller(getch, cfg):
     """
     Prints a text in a side-scrolling manner.
     """
-    cfg = init_utils(write_config)
     argv = {}
     argv["term_rows"] = shutil.get_terminal_size()[1]
     argv["term_columns"] = shutil.get_terminal_size()[0] - (1 if IS_WINDOWS else 0)

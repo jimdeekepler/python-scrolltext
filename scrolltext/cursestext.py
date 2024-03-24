@@ -4,7 +4,7 @@ A simple curses-based side scrolling text application.
 from curses import wrapper, error
 import curses
 import logging
-from .utils import CharacterScroller, IS_WINDOWS, init_utils
+from .utils import CharacterScroller, IS_WINDOWS
 
 
 QUIT_CHARACTERS = ["\x1B", "Q", "q"]
@@ -13,19 +13,18 @@ QUIT_CHARACTERS = ["\x1B", "Q", "q"]
 log = logging.getLogger(__name__)
 
 
-def curses_scroller(win, write_config):
+def curses_scroller(win, cfg):
     """
     Curses-main: render a text in a side-scrolling manner, using curses.
 
     :param win: Internal curses based object
     :type win: curses._window
-    :param write_config: Write initial config
-    :type: bool
+    :param cfg: Config object
+    :type: configerparser.ConfigParser
     """
     winsize = win.getmaxyx()
     log.debug("win dimensions: (columns, rows) (%d, %d)", winsize[1], winsize[0])
 
-    cfg = init_utils(write_config)
     box = cfg["cursestext"].getboolean("box")
     # try:
     if box:
@@ -86,11 +85,11 @@ def check_quit(win):
     return False
 
 
-def work(write_config):
+def work(cfg):
     """Main usese curses.wrapper. See curses doc for details.
     """
     try:  # noqa: C901 ignoring 'TryExcept 42' is too complex - fix later
-        wrapper(curses_scroller, write_config)
+        wrapper(curses_scroller, cfg)
     except error as ex:
         log.exception(ex)
     finally:
