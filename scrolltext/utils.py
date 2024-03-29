@@ -197,7 +197,6 @@ class CharacterScroller:  # pylint: disable=R0902  # disable (too-many-instance-
         self.visible_text_length = self.term_size.get_cols()
         log.debug("visibile_text_length: %d", self.visible_text_length)
         self.min_scroll_line = argv["min_scroll_line"] if "min_scroll_line" in argv else 0
-        self.visible_text_length = argv["term_columns"]
         self.endless = cfg["main"].getboolean("endless")
 
         section_index = str(argv["section_index"]) if "section_index" in argv else "1"
