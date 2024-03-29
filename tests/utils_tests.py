@@ -1,7 +1,7 @@
 """Unittests for utils class."""
 import configparser
 import unittest
-from scrolltext.utils import CharacterScroller, parse_int
+from scrolltext.utils import CharacterScroller, TermSize, parse_int
 
 
 class CharacterScrollTests(unittest.TestCase):
@@ -142,6 +142,25 @@ class CharacterScrollTests(unittest.TestCase):
                 pass
             cnt += 1
         self.assertTrue(((cnt + len(scroll_text)) // 2) == len(scroll_text))
+
+
+class TermSizeTests(unittest.TestCase):
+    """Tests cases for TermSize"""
+    def test_80x25(self):
+        term_size = TermSize(80, 25)
+        self.assertEqual(term_size.get_cols(), 80)
+        self.assertEqual(term_size.get_rows(), 25)
+        self.assertFalse(term_size.is_resized())
+
+    def test_80x25_resize_to_132x25(self):
+        term_size = TermSize(80, 25)
+        self.assertEqual(term_size.get_cols(), 80)
+        self.assertEqual(term_size.get_rows(), 25)
+        term_size.set_size(132, 25)
+        self.assertTrue(term_size.is_resized())
+        self.assertEqual(term_size.get_cols(), 132)
+        self.assertEqual(term_size.get_rows(), 25)
+        self.assertFalse(term_size.is_resized())  # is_resize works as a toggle option
 
 
 class ParseIntTests(unittest.TestCase):  # x  xx maybe remove

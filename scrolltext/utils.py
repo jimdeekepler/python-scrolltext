@@ -125,6 +125,53 @@ def _override_scroll_speed(cfg):
         cfg["scrolltext.text 1"]["speed"] = str(scroll_speed_index)
 
 
+class TermSize:
+    """
+    Stores terminal columns and rows
+    """
+    def __init__(self, cols, rows):
+        """
+        Initializes current terminal size
+        :param cols: Current terminal columns
+        :ptype cols: int
+        :param rows: Current terminal rows
+        :ptype rows: int
+        """
+        self.term_columns =  cols
+        self.term_rows = rows
+        self.resized = False
+
+    def set_size(self, cols, rows):
+        """
+        Checks if the terminal window size has changed, and sets the
+        new term columns and rows paramters. Also sets the resized flag.
+        """
+        if self.term_columns != cols:
+            self.term_columns = cols
+            self.resized = True
+        if self.term_rows != rows:
+            self.term_rows = rows
+            self.resized = True
+        if self.resized:
+            log.debug("TermSize  columns: %d  rows: %d", self.term_columns, self.term_rows)
+
+    def is_resized(self):
+        """
+        Returns true, when the terminal window changed its size.
+        """
+        resized = self.resized
+        self.resized = False
+        if resized:
+            log.debug("TermSize resized")
+        return resized
+
+    def get_cols(self):
+        return self.term_columns
+
+    def get_rows(self):
+        return self.term_rows
+
+
 class CharacterScroller:  # pylint: disable=R0902  # disable (too-many-instance-attributes)
     """
     Utility class  for all character based text-scrollers.
