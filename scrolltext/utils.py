@@ -63,6 +63,8 @@ def get_linenum(scroll_line_str, min_row, max_row):
         line = max_row + line + 1
     line = max(line, min_row)
     line = min(line, max_row)
+    log.debug("scroll_line_str: %s  min: %d  max: %d  line:%d",
+              scroll_line_str, min_row, max_row, line)
     return line
 
 
