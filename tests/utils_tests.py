@@ -29,14 +29,15 @@ class CharacterScrollTests(unittest.TestCase):
         """"Test creation of CharacterScroller with no parameters."""
         with self.assertRaises(Exception):
             argv = {}
-            CharacterScroller(self.cfg, **argv)
+            CharacterScroller(self.cfg, None, **argv)
 
     def test_dunno_visible_text_length_is_zero(self):
         """"Test with visibile window size set to 0."""
         cnt = 0
+        term_size = TermSize(0, 0)
         self.argv["term_columns"] = 0
         self.argv["blanks"] = 1
-        for text in CharacterScroller(self.cfg, **self.argv):
+        for text in CharacterScroller(self.cfg, term_size, **self.argv):
             self.assertEqual("", text)
             cnt += 1
         self.assertEqual(cnt, len(self.cfg["scrolltext.text 1"]["text"]) + 2)
@@ -44,14 +45,14 @@ class CharacterScrollTests(unittest.TestCase):
     def test_scroll_character_for_character(self):
         """"Test with visibile window size set to 1, or character by
         character respectively."""
-        self.argv["term_columns"] = 1
+        term_size = TermSize(1, 0)
         self.argv["blanks"] = 0
         scroll_text = "Hello, world"
         self.cfg["scrolltext.text 1"]["text"] = scroll_text
         self.cfg["scrolltext.text 1"]["direction"] = "0"
         expected = list(self.cfg["scrolltext.text 1"]["text"])
         cnt = 0
-        for text in CharacterScroller(self.cfg, **self.argv):
+        for text in CharacterScroller(self.cfg, term_size, **self.argv):
             self.assertEqual(expected[cnt], text)
             cnt += 1
         self.assertEqual(cnt, len(self.cfg["scrolltext.text 1"]["text"]))
@@ -59,7 +60,7 @@ class CharacterScrollTests(unittest.TestCase):
     def test_scroll_character_for_character_with_spaces(self):
         """"Test with visibile window size set to 1, and a leading
         and trailing blank character."""
-        self.argv["term_columns"] = 1
+        term_size = TermSize(1, 0)
         self.argv["blanks"] = 1
         scroll_text = "Hello, world"
         self.cfg["scrolltext.text 1"]["text"] = scroll_text
@@ -67,7 +68,7 @@ class CharacterScrollTests(unittest.TestCase):
         scroll_text2 = " " + scroll_text + " "
         expected = list(scroll_text2)
         cnt = 0
-        for text in CharacterScroller(self.cfg, **self.argv):
+        for text in CharacterScroller(self.cfg, term_size, **self.argv):
             self.assertEqual(expected[cnt], text)
             cnt += 1
         self.assertEqual(cnt, len(scroll_text) + 2)
@@ -77,12 +78,12 @@ class CharacterScrollTests(unittest.TestCase):
         scroll_text = "Hello, world"
         self.cfg["scrolltext.text 1"]["text"] = scroll_text
         self.cfg["scrolltext.text 1"]["direction"] = "0"
-        self.argv["term_columns"] = 2
+        term_size = TermSize(2, 0)
         self.argv["blanks"] = 1
         expected = [" H", "He", "el", "ll", "lo", "o,", ", ", " w", "wo", "or",
                     "rl", "ld", "d ", " "]
         cnt = 0
-        for text in CharacterScroller(self.cfg, **self.argv):
+        for text in CharacterScroller(self.cfg, term_size, **self.argv):
             self.assertEqual(expected[cnt], text)
             cnt += 1
         self.assertEqual(cnt, len(scroll_text) + 2)
@@ -95,10 +96,10 @@ class CharacterScrollTests(unittest.TestCase):
         expected = [" Hello, world ", "Hello, world ", "ello, world ", "llo, world ",
                     "lo, world ", "o, world ", ", world ", " world ", "world ",
                     "orld ", "rld ", "ld ", "d ", " "]
-        self.argv["term_columns"] = 80
+        term_size = TermSize(80, 0)
         self.argv["blanks"] = 1
         cnt = 0
-        for text in CharacterScroller(self.cfg, **self.argv):
+        for text in CharacterScroller(self.cfg, term_size, **self.argv):
             self.assertEqual(expected[cnt], text)
             cnt += 1
         self.assertEqual(cnt, len(scroll_text) + 2)
@@ -109,14 +110,14 @@ class CharacterScrollTests(unittest.TestCase):
         scroll_text = "Hello, world"
         self.cfg["scrolltext.text 1"]["text"] = scroll_text
         self.cfg["scrolltext.text 1"]["direction"] = "1"
-        self.argv["term_columns"] = 1
+        term_size = TermSize(1, 0)
         self.argv["blanks"] = 0
         scroll_text_list = list(self.cfg["scrolltext.text 1"]["text"])
         scroll_text_list.reverse()
         scroll_text = "".join(scroll_text_list)
         expected = list(scroll_text)
         cnt = 0
-        for text in CharacterScroller(self.cfg, **self.argv):  # 1, 0, scroll_text, 1, 0):
+        for text in CharacterScroller(self.cfg, term_size, **self.argv):
             try:
                 self.assertEqual(expected[cnt], text)
             except IndexError:
@@ -128,14 +129,14 @@ class CharacterScrollTests(unittest.TestCase):
         """"Right-to-Left text. Test with visibile window size set to 1, or character by
         character respectively."""
         self.cfg["scrolltext.text 1"]["direction"] = "1"
-        self.argv["term_columns"] = 1
+        term_size = TermSize(1, 0)
         self.argv["blanks"] = 0
         scroll_text = "مرحباً فيلت"
         self.cfg["scrolltext.text 1"]["text"] = scroll_text
         expected = list(scroll_text)
         expected.reverse()
         cnt = 0
-        for text in CharacterScroller(self.cfg, **self.argv):  # 1, 0, scroll_text, 1, 0):
+        for text in CharacterScroller(self.cfg, term_size, **self.argv):
             try:
                 self.assertEqual(expected[cnt], text)
             except IndexError:

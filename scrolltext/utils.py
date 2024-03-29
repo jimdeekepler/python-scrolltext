@@ -181,28 +181,30 @@ class CharacterScroller:  # pylint: disable=R0902  # disable (too-many-instance-
     Utility class  for all character based text-scrollers.
     """
 
-    def __init__(self, cfg, **argv):
+    def __init__(self, cfg, term_size, **argv):
         """Objects init method.
         :param cfg: Configuration dictionary
         :type: configparser.ConfigParser
+        :param term_size: Current terminal size, number of available columns and rows
+        :type: TermSize
         :param argv["section_index"]: Number of scrolltext.text section in use [1..3]
         :param argv["term_rows"]: Terminal height in number of rows
         :param argv["term_columns"]: Terminal width in number of columns
         :param argv["min_scroll_line"]: The minimum terminal row allowed
         :param argv["test"]: Only used in unittests
         """
-        self.visible_text_length = argv["term_columns"]
+        self.term_size = term_size
+        self.visible_text_length = self.term_size.get_cols()
+        log.debug("visibile_text_length: %d", self.visible_text_length)
+        self.min_scroll_line = argv["min_scroll_line"] if "min_scroll_line" in argv else 0
 
         section_index = str(argv["section_index"]) if "section_index" in argv else "1"
         str_section = "scrolltext.text " + section_index
         scroll_text = cfg[str_section]["text"]
-        scroll_line_str = cfg[str_section]["line"]
+        self.scroll_line_str = cfg[str_section]["line"]
         scroll_direction = cfg[str_section].getboolean("direction")
 
-        self.line = get_linenum(scroll_line_str, argv["min_scroll_line"], argv["term_rows"])
-        log.debug("screenline %d", self.line)
-        log.debug("scrolltext length: %d", len(scroll_text))
-        log.debug("scrolltext part: >> %s <<", scroll_text[20:100])
+        self._resized()
 
         num_blanks = argv["blanks"] if "blanks" in argv else self.visible_text_length
         self.blanks = num_blanks * " "
@@ -230,6 +232,14 @@ class CharacterScroller:  # pylint: disable=R0902  # disable (too-many-instance-
     def __iter__(self):
         return iter(self.next, None)
 
+    def _resized(self):
+        self.line = get_linenum(self.scroll_line_str,
+                                self.min_scroll_line, self.term_size.get_rows())
+        self.visible_text_length = self.term_size.get_cols()
+        log.debug("_resized  line: %d  columnns: %d  rows: %d  text-length %d",
+                  self.line, self.term_size.get_cols(),
+                  self.term_size.get_rows(), self.visible_text_length)
+
     def next(self):
         """
         Gives the next visible text to display by the client-program.
@@ -237,6 +247,8 @@ class CharacterScroller:  # pylint: disable=R0902  # disable (too-many-instance-
         :returns: A str object of visible text length
         :rtype: str
         """
+        if self.term_size.is_resized():
+            self._resized()
         if not self.right_to_left:
             return self._next_left_to_right()
         return self._next_right_to_left()
