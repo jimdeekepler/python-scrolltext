@@ -168,9 +168,11 @@ class TermSize:
         return resized
 
     def get_cols(self):
+        """ Return terminal columns. """
         return self.term_columns
 
     def get_rows(self):
+        """ Return terminal rows. """
         return self.term_rows
 
 
