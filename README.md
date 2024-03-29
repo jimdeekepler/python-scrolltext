@@ -71,6 +71,11 @@ Fastest scrolling speed.
 
 ## Changes
 
+### unreleased
+
+ - attempt to handle term resizes
+ - added conig-option: endless  (see newly generated configfile)
+
 ### v0.0.8
 
  - doc-comments have never been generated, nor are those validated. (TODO)
