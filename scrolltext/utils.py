@@ -139,7 +139,7 @@ class TermSize:
         :param rows: Current terminal rows
         :ptype rows: int
         """
-        self.term_columns =  cols
+        self.term_columns = cols
         self.term_rows = rows
         self.resized = False
 
