@@ -147,12 +147,16 @@ class CharacterScrollTests(unittest.TestCase):
 class TermSizeTests(unittest.TestCase):
     """Tests cases for TermSize"""
     def test_80x25(self):
+        """ Test for a 80 columns and 25 rows term.
+        """
         term_size = TermSize(80, 25)
         self.assertEqual(term_size.get_cols(), 80)
         self.assertEqual(term_size.get_rows(), 25)
         self.assertFalse(term_size.is_resized())
 
     def test_80x25_resize_to_132x25(self):
+        """ Test resizing a term.
+        """
         term_size = TermSize(80, 25)
         self.assertEqual(term_size.get_cols(), 80)
         self.assertEqual(term_size.get_rows(), 25)
