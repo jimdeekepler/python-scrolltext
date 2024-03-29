@@ -188,8 +188,6 @@ class CharacterScroller:  # pylint: disable=R0902  # disable (too-many-instance-
         :param term_size: Current terminal size, number of available columns and rows
         :type: TermSize
         :param argv["section_index"]: Number of scrolltext.text section in use [1..3]
-        :param argv["term_rows"]: Terminal height in number of rows
-        :param argv["term_columns"]: Terminal width in number of columns
         :param argv["min_scroll_line"]: The minimum terminal row allowed
         :param argv["test"]: Only used in unittests
         """
