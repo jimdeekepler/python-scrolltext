@@ -192,22 +192,19 @@ class CharacterScroller:  # pylint: disable=R0902  # disable (too-many-instance-
         :param argv["test"]: Only used in unittests
         """
         self.term_size = term_size
-        self.visible_text_length = self.term_size.get_cols()
-        log.debug("visibile_text_length: %d", self.visible_text_length)
         self.min_scroll_line = argv["min_scroll_line"] if "min_scroll_line" in argv else 0
         self.endless = cfg["main"].getboolean("endless")
 
         section_index = str(argv["section_index"]) if "section_index" in argv else "1"
         str_section = "scrolltext.text " + section_index
-        scroll_text = cfg[str_section]["text"]
+        self.scroll_text = cfg[str_section]["text"]
         self.scroll_line_str = cfg[str_section]["line"]
         scroll_direction = cfg[str_section].getboolean("direction")
 
-        self._resized()
+        self.visible_text_length = -1
+        self._resized(**argv)
 
-        num_blanks = argv["blanks"] if "blanks" in argv else self.visible_text_length
-        self.blanks = num_blanks * " "
-        self.complete_text = self.blanks + scroll_text + (self.blanks if not self.endless else "")
+        self._update_complete_text()
         self.pos = 0
         self._last_pos = 0
         self.terminal_pos = len(self.complete_text)
@@ -223,13 +220,21 @@ class CharacterScroller:  # pylint: disable=R0902  # disable (too-many-instance-
     def __iter__(self):
         return iter(self.next, None)
 
-    def _resized(self):
+    def _resized(self, **argv):
         self.line = get_linenum(self.scroll_line_str,
                                 self.min_scroll_line, self.term_size.get_rows())
-        self.visible_text_length = self.term_size.get_cols()
+        if self.term_size.get_cols() != self.visible_text_length:
+            self.visible_text_length = self.term_size.get_cols()
+            log.debug("visibile_text_length: %d", self.visible_text_length)
+            self.num_blanks = argv["blanks"] if "blanks" in argv else self.visible_text_length
+            self._update_complete_text()
         log.debug("_resized  line: %d  columnns: %d  rows: %d  text-length %d",
                   self.line, self.term_size.get_cols(),
                   self.term_size.get_rows(), self.visible_text_length)
+
+    def _update_complete_text(self):
+        blanks = self.num_blanks * " "
+        self.complete_text = blanks + self.scroll_text + (blanks if not self.endless else "")
 
     def next(self):
         """
