@@ -65,7 +65,7 @@ Fastest scrolling speed.
 
 ## Bugs and quirks
 
- - does not detect term-resize
+ - attempts to detect term-resize, and clumsily adjusts some things
  - no colors
 
 
@@ -74,7 +74,8 @@ Fastest scrolling speed.
 ### unreleased
 
  - attempt to handle term resizes
- - added conig-option: endless  (see newly generated configfile)
+ - added config-option: endless  (see newly generated config-file)
+ - removed logging from main branch (you may find it on the devel branch)
 
 ### v0.0.8
 
