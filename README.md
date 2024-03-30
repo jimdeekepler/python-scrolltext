@@ -71,7 +71,7 @@ Fastest scrolling speed.
 
 ## Changes
 
-### unreleased
+### v0.0.9
 
  - attempt to handle term resizes
  - added config-option: endless  (see newly generated config-file)
