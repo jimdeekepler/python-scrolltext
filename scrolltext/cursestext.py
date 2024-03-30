@@ -3,7 +3,6 @@ A simple curses-based side scrolling text application.
 """
 from curses import wrapper, error
 import curses
-import logging
 from .utils import CharacterScroller, IS_WINDOWS, TermSize
 
 
@@ -11,9 +10,6 @@ NUM_COLORS = 0
 QUIT_CHARACTERS = ["\x1B", "Q", "q"]
 START_INDEX = 2
 COLOR_UP = True
-
-
-log = logging.getLogger(__name__)
 
 
 def curses_scroller(win, cfg):
@@ -59,7 +55,6 @@ def do_textloop(win, cfg, term_size, scroller, min_scroll_line):
     This method loops over the scrolled text
     """
     box = cfg["cursestext"].getboolean("box")
-    term_too_small_printed = False
     for text in scroller:
         win_text = text
         # hack: When writing to the last line we prevent adding an immediate newline and thus
@@ -90,11 +85,8 @@ def get_char(win):
     :returns: curses.KEY_EXIT, if a quit character is entered, the current character, otherwise.
     :rtype: int
     """
-    log.debug("getch")
     character = None
     character = win.getch(0, 0)
-    if character != -1:
-        log.debug("got key (%d)  type %s", character, type(character))
     if character != -1 and (chr(character) in QUIT_CHARACTERS):
         return curses.KEY_EXIT
     return character
@@ -105,7 +97,6 @@ def update_term_size(win, box, term_size):
     Updates TermSize object.
     """
     winsize = win.getmaxyx()
-    log.debug("win dimensions: (columns, rows) (%d, %d)", winsize[1], winsize[0])
     available_rows = winsize[0] - (2 if box else 1)
     available_columns = winsize[1] - (2 if box else 0)
     term_size.set_size(available_columns, available_rows)
@@ -128,11 +119,10 @@ def draw_items(win, box, min_scroll_line, scroller, term_size):
 
 
 def _addstr_wrapper(win, row, column, text):
-    log.debug("addstr to line %d", row)
     try:
         win.addstr(row, column, text)
-    except curses.error:
-        log.exception("Error in addstr")
+    except:  # pylint: disable=W0702 (bare-except)
+        pass
 
 
 def _addstr_with_colors_wrapper(win, row, column, text, /, *args):
@@ -215,7 +205,5 @@ def work(cfg):
     """
     try:  # noqa: C901 ignoring 'TryExcept 42' is too complex - fix later
         wrapper(curses_scroller, cfg)
-    except error as ex:
-        log.exception(ex)
-    finally:
-        log.debug("end")
+    except error:
+        pass

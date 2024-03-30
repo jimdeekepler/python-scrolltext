@@ -1,8 +1,6 @@
 """
 Utilities for line-based text scrollers.
 """
-import logging
-import sys
 from os import getenv
 from time import time
 from scrolltext.config import get_speedsec_float, init_config
@@ -15,8 +13,6 @@ HOME = "\033[H"
 BOLD = "\033[1m"
 NORMAL = "\033[0m"
 UP_ONE_ROW = "\033[1A"
-
-log = logging.getLogger(__name__)
 
 
 def parse_int(var):
@@ -43,7 +39,6 @@ def init_utils(write_config):
     """
     cfg = init_config(write_config)
     _override_from_env(cfg)
-    _init_logging(cfg)
     return cfg
 
 
@@ -66,15 +61,7 @@ def get_linenum(scroll_line_str, min_row, max_row):
         line = max_row + line + 1
     line = max(line, min_row)
     line = min(line, max_row)
-    log.debug("scroll_line_str: %s  min: %d  max: %d  line:%d",
-              scroll_line_str, min_row, max_row, line)
     return line
-
-
-def _init_logging(cfg):
-    verbose = cfg["main"].getboolean("verbose")
-    if verbose:
-        logging.basicConfig(filename="scrolltext.log", filemode="w", level=logging.DEBUG)
 
 
 def _override_from_env(cfg):
@@ -87,20 +74,21 @@ def _override_from_env(cfg):
 
 
 def _override_verbose(cfg):
-    _check_and_override_boolean_var(cfg, "VERBOSE", ["main", "verbose"])
+    verbose = getenv("VERBOSE") == "1"
+    if verbose:
+        cfg["main"]["verbose"] = "1"
 
 
 def _override_scroll_box(cfg):
-    _check_and_override_boolean_var(cfg, "SCROLL_BOX", ["cursestext", "box"])
+    scroll_direction = getenv("SCROLL_BOX") == "1"
+    if scroll_direction:
+        cfg["cursestext"]["box"] = "1"
 
 
 def _override_scroll_direction(cfg):
-    _check_and_override_boolean_var(cfg, "SCROLL_DIRECTION", ["scrolltext.text 1", "direction"])
-
-
-def _override_scroll_text(cfg):
-    scroll_text = getenv("SCROLL_TEXT")
-    if scroll_text:
+    scroll_direction = getenv("SCROLL_DIRECTION") == "1"
+    if scroll_direction:
+        cfg["scrolltext.text 1"]["direction"] = "1"
         if EARLY_VERBOSE:
             print("Using env-var 'SCROLL_TEXT'", file=sys.stderr)
         cfg["scrolltext.text 1"]["text"] = scroll_text
@@ -109,8 +97,6 @@ def _override_scroll_text(cfg):
 def _override_scroll_line(cfg):
     scroll_line_str = getenv("SCROLL_LINE")
     if scroll_line_str:
-        if EARLY_VERBOSE:
-            print("Using env-var 'SCROLL_LINE_STR'", file=sys.stderr)
         cfg["scrolltext.text 1"]["line"] = scroll_line_str
 
 
@@ -118,9 +104,6 @@ def _override_scroll_speed(cfg):
     scroll_speed = getenv("SCROLL_SPEED")
     if scroll_speed:
         scroll_speed_index = parse_int(getenv("SCROLL_SPEED"))
-        if EARLY_VERBOSE:
-            # pylint: disable=C0209  (consider-using-f-string)
-            print("Using env-var 'SCROLL_SPEED' with '{}'".format(scroll_speed), file=sys.stderr)
         cfg["scrolltext.text 1"]["speed"] = str(scroll_speed_index)
 
 
@@ -171,8 +154,6 @@ class TermSize:
         if self.term_rows != rows:
             self.term_rows = rows
             self.resized = True
-        if self.resized:
-            log.debug("TermSize  columns: %d  rows: %d", self.term_columns, self.term_rows)
 
     def is_resized(self):
         """
@@ -180,8 +161,6 @@ class TermSize:
         """
         resized = self.resized
         self.resized = False
-        if resized:
-            log.debug("TermSize resized")
         return resized
 
     def get_cols(self):
@@ -242,12 +221,8 @@ class CharacterScroller:  # pylint: disable=R0902  # disable (too-many-instance-
                                 self.min_scroll_line, self.term_size.get_rows())
         if self.term_size.get_cols() != self.visible_text_length:
             self.visible_text_length = self.term_size.get_cols()
-            log.debug("visible_text_length: %d", self.visible_text_length)
             self.num_blanks = argv["blanks"] if "blanks" in argv else self.visible_text_length
             self._update_complete_text()
-        log.debug("_resized  line: %d  columns: %d  rows: %d  text-length %d",
-                  self.line, self.term_size.get_cols(),
-                  self.term_size.get_rows(), self.visible_text_length)
 
     def _update_complete_text(self):
         blanks = self.num_blanks * " "

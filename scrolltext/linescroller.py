@@ -1,7 +1,6 @@
 """
 A simple side scrolling text application.
 """
-import logging
 import shutil
 from time import sleep
 from .utils import CLEAR, HOME, BOLD, NORMAL, IS_WINDOWS, UP_ONE_ROW, CharacterScroller, TermSize
@@ -14,7 +13,6 @@ DEFAULT_COLOR_TABLE_GREYSCALE_256 = ["38;5;" + str(x) + "m" for x in range(236, 
 DEFAULT_COLOR_TABLE_CONSOLE = [str(x) + "m" for x in [30, 34, 35, 36, 31, 32, 33]]
 COLOR_TABLES = [DEFAULT_COLOR_TABLE_GREYSCALE_256, DEFAULT_COLOR_TABLE_CONSOLE]
 last_term_rows = -1  # pylint: disable=C0103 (invalid-name)
-log = logging.getLogger(__name__)
 
 
 def linescroller(cfg):
@@ -112,10 +110,6 @@ def _check_user_keypress(getch):
     Use getchtimeout to get a character. If "Q" or "q" is given, then it raises SystemExit
     """
     character = getch.getch(timeout=.1)
-    if isinstance(character, int):
-        log.debug("Got key '%d'", character)
-    elif isinstance(character, str):
-        log.debug("Got key '%s'", character)
     if character is not None and character in ["\033", "\x1b", "", "\r", "", " ", "Q", "q"]:
         log.debug("Got key '%s'. Quitting.", character)
         print(f"{NORMAL}")

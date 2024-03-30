@@ -3,7 +3,6 @@ Config module for scrolltext
 """
 from pathlib import Path
 import configparser
-import logging
 import sys
 
 
@@ -12,9 +11,6 @@ DEF_SCROLL_TEXT = """\
 Hello, this is a  classic side scrolling text. It can be configured via the 'scolltextrc' \
 config file. Find it in ~/.config/scrolltextrc or in the current working directory."""
 SCROLL_SPEEDS = [.25, .20, .18, .15, .125, .1, .09, .08, .075, .07, .0675]
-
-
-log = logging.getLogger(__name__)
 
 
 initial_config = {
@@ -55,7 +51,6 @@ def init_config(write_config):
 
     cfg, really_write = _read_config(config_path)
     if write_config and really_write:
-        log.info("Writing a new config '%s' using defaults", config_path)
         _write_config(cfg, config_path)
     return cfg
 
@@ -66,15 +61,11 @@ def _read_config(config_path):
     """
     really_write = False
     cfg = configparser.ConfigParser(default_section="main")
-    log.debug("try read config path: '%s'", config_path)
-    successfully_read_files = cfg.read(config_path)
+    read_config_files = cfg.read(config_path)
 
-    if not successfully_read_files:
-        really_write = True  # We only write a config file, when it does not already exist.
-        log.info("No config file found")
+    if not read_config_files:
+        really_write = True
         cfg.update(initial_config)
-    else:
-        log.debug("config files read: '%s'", successfully_read_files)
     _validate(cfg)
     return cfg, really_write
 
@@ -95,19 +86,15 @@ def _validate(cfg):
             raise NameError("Section '" + section + "' is missing in config")
         _validate_section_entries(cfg, section, entries)
 
-    log.debug(cfg["main"]["action"])
-
     # NOTE: allow for several "scrolltext.text %d" sections
     # for index in range(2, 9):
     #     scrolltext_section = "scrolltext.text " + str(index)
     #     if not scrolltext_section in cfg:
     #         cfg["main"]["max_index"] = str(index - 1)
-    #         log.debug("max scrolltext.text %d", cfg["main"]["max_index"])
     #         break
     _fix_scrolltext_section(cfg, "scrolltext.text 1")
     if "cursestext" not in cfg:
         cfg["cursestext"] = {"box": "1"}
-    log.debug("cursestext draw box: %s", cfg["cursestext"].getboolean("box"))
 
 
 def _validate_section_entries(cfg, section, entries):
@@ -124,4 +111,3 @@ def _fix_scrolltext_section(cfg, section_name):
     text_lines = cfg[section_name]["text"]
     text = "".join(text_lines.split("\n"))
     cfg[section_name]["text"] = text
-    log.debug(text)
