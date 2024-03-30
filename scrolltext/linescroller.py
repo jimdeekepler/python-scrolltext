@@ -1,7 +1,6 @@
 """
 A simple side scrolling text application.
 """
-import logging
 import shutil
 from time import sleep
 from .utils import CLEAR, HOME, IS_WINDOWS, UP_ONE_ROW, CharacterScroller, TermSize
@@ -11,7 +10,6 @@ if not IS_WINDOWS:
 
 
 last_term_rows = -1  # pylint: disable=C0103 (invalid-name)
-log = logging.getLogger(__name__)
 
 
 def linescroller(cfg):
@@ -70,8 +68,6 @@ def _check_input(getch):
     Use getchtimeout to get a character. If "Q" or "q" is given, then it raises SystemExit
     """
     character = getch.getch(timeout=.1)
-    if isinstance(character, int) == int:
-        log.debug("Got key '%d'", character)
     if character is not None and character in ["\033", "\x1b", "", "\r", "", " ", "Q", "q"]:
         raise RuntimeError()
 

@@ -1,7 +1,6 @@
 """
 Utilities for line-based text scrollers.
 """
-import logging
 from os import getenv
 from time import time
 from scrolltext.config import get_speedsec_float, init_config
@@ -11,9 +10,6 @@ from scrolltext.config import IS_WINDOWS  # pylint: disable=no-name-in-module (W
 CLEAR = "\033[2J"
 HOME = "\033[H"
 UP_ONE_ROW = "\033[1A"
-
-
-log = logging.getLogger(__name__)
 
 
 def parse_int(var):
@@ -40,7 +36,6 @@ def init_utils(write_config):
     """
     cfg = init_config(write_config)
     _override_from_env(cfg)
-    _init_logging(cfg)
     return cfg
 
 
@@ -63,16 +58,7 @@ def get_linenum(scroll_line_str, min_row, max_row):
         line = max_row + line + 1
     line = max(line, min_row)
     line = min(line, max_row)
-    log.debug("scroll_line_str: %s  min: %d  max: %d  line:%d",
-              scroll_line_str, min_row, max_row, line)
     return line
-
-
-def _init_logging(cfg):
-    verbose = cfg["main"].getboolean("verbose")
-    if verbose:
-        # logging.basicConfig(filename="cursesscroller.log", filemode="w", level=logging.DEBUG)
-        logging.basicConfig(filename="scrolltext.log", filemode="w", level=logging.DEBUG)
 
 
 def _override_from_env(cfg):
@@ -87,35 +73,30 @@ def _override_from_env(cfg):
 def _override_verbose(cfg):
     verbose = getenv("VERBOSE") == "1"
     if verbose:
-        log.debug("Using env-var 'VERBOSE'")
         cfg["main"]["verbose"] = "1"
 
 
 def _override_scroll_box(cfg):
     scroll_direction = getenv("SCROLL_BOX") == "1"
     if scroll_direction:
-        log.debug("Using env-var 'SCROLL_BOX'")
         cfg["cursestext"]["box"] = "1"
 
 
 def _override_scroll_direction(cfg):
     scroll_direction = getenv("SCROLL_DIRECTION") == "1"
     if scroll_direction:
-        log.debug("Using env-var 'SCROLL_DIRECTION'")
         cfg["scrolltext.text 1"]["direction"] = "1"
 
 
 def _override_scroll_text(cfg):
     scroll_text = getenv("SCROLL_TEXT")
     if scroll_text:
-        log.debug("Using env-var 'SCROLL_TEXT'")
         cfg["scrolltext.text 1"]["text"] = scroll_text
 
 
 def _override_scroll_line(cfg):
     scroll_line_str = getenv("SCROLL_LINE")
     if scroll_line_str:
-        log.debug("Using env-var 'SCROLL_LINE_STR'")
         cfg["scrolltext.text 1"]["line"] = scroll_line_str
 
 
@@ -123,7 +104,6 @@ def _override_scroll_speed(cfg):
     scroll_speed = getenv("SCROLL_SPEED")
     if scroll_speed:
         scroll_speed_index = parse_int(getenv("SCROLL_SPEED"))
-        log.debug("Using env-var 'SCROLL_SPEED' with '%s'", scroll_speed)
         cfg["scrolltext.text 1"]["speed"] = str(scroll_speed_index)
 
 
@@ -154,8 +134,6 @@ class TermSize:
         if self.term_rows != rows:
             self.term_rows = rows
             self.resized = True
-        if self.resized:
-            log.debug("TermSize  columns: %d  rows: %d", self.term_columns, self.term_rows)
 
     def is_resized(self):
         """
@@ -163,8 +141,6 @@ class TermSize:
         """
         resized = self.resized
         self.resized = False
-        if resized:
-            log.debug("TermSize resized")
         return resized
 
     def get_cols(self):
@@ -225,12 +201,8 @@ class CharacterScroller:  # pylint: disable=R0902  # disable (too-many-instance-
                                 self.min_scroll_line, self.term_size.get_rows())
         if self.term_size.get_cols() != self.visible_text_length:
             self.visible_text_length = self.term_size.get_cols()
-            log.debug("visibile_text_length: %d", self.visible_text_length)
             self.num_blanks = argv["blanks"] if "blanks" in argv else self.visible_text_length
             self._update_complete_text()
-        log.debug("_resized  line: %d  columnns: %d  rows: %d  text-length %d",
-                  self.line, self.term_size.get_cols(),
-                  self.term_size.get_rows(), self.visible_text_length)
 
     def _update_complete_text(self):
         blanks = self.num_blanks * " "
