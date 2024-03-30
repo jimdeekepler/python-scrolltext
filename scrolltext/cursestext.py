@@ -122,7 +122,6 @@ def _addstr_wrapper(win, row, column, text):
     try:
         win.addstr(row, column, text)
     except curses.error:
-        log.exception("Error in addstr")
         pass
 
 

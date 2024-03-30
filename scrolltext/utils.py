@@ -75,20 +75,21 @@ def _override_from_env(cfg):
 
 
 def _override_verbose(cfg):
-    _check_and_override_boolean_var(cfg, "VERBOSE", ["main", "verbose"])
+    verbose = getenv("VERBOSE") == "1"
+    if verbose:
+        cfg["main"]["verbose"] = "1"
 
 
 def _override_scroll_box(cfg):
-    _check_and_override_boolean_var(cfg, "SCROLL_BOX", ["cursestext", "box"])
+    scroll_direction = getenv("SCROLL_BOX") == "1"
+    if scroll_direction:
+        cfg["cursestext"]["box"] = "1"
 
 
 def _override_scroll_direction(cfg):
-    _check_and_override_boolean_var(cfg, "SCROLL_DIRECTION", ["scrolltext.text 1", "direction"])
-
-
-def _override_scroll_text(cfg):
-    scroll_text = getenv("SCROLL_TEXT")
-    if scroll_text:
+    scroll_direction = getenv("SCROLL_DIRECTION") == "1"
+    if scroll_direction:
+        cfg["scrolltext.text 1"]["direction"] = "1"
         if EARLY_VERBOSE:
             print("Using env-var 'SCROLL_TEXT'", file=sys.stderr)
         cfg["scrolltext.text 1"]["text"] = scroll_text
@@ -97,8 +98,6 @@ def _override_scroll_text(cfg):
 def _override_scroll_line(cfg):
     scroll_line_str = getenv("SCROLL_LINE")
     if scroll_line_str:
-        if EARLY_VERBOSE:
-            print("Using env-var 'SCROLL_LINE_STR'", file=sys.stderr)
         cfg["scrolltext.text 1"]["line"] = scroll_line_str
 
 
@@ -106,9 +105,6 @@ def _override_scroll_speed(cfg):
     scroll_speed = getenv("SCROLL_SPEED")
     if scroll_speed:
         scroll_speed_index = parse_int(getenv("SCROLL_SPEED"))
-        if EARLY_VERBOSE:
-            # pylint: disable=C0209  (consider-using-f-string)
-            print("Using env-var 'SCROLL_SPEED' with '{}'".format(scroll_speed), file=sys.stderr)
         cfg["scrolltext.text 1"]["speed"] = str(scroll_speed_index)
 
 
@@ -226,17 +222,8 @@ class CharacterScroller:  # pylint: disable=R0902  # disable (too-many-instance-
                                 self.min_scroll_line, self.term_size.get_rows())
         if self.term_size.get_cols() != self.visible_text_length:
             self.visible_text_length = self.term_size.get_cols()
-<<<<<<< HEAD
             self.num_blanks = argv["blanks"] if "blanks" in argv else self.visible_text_length
             self._update_complete_text()
-=======
-            log.debug("visible_text_length: %d", self.visible_text_length)
-            self.num_blanks = argv["blanks"] if "blanks" in argv else self.visible_text_length
-            self._update_complete_text()
-        log.debug("_resized  line: %d  columns: %d  rows: %d  text-length %d",
-                  self.line, self.term_size.get_cols(),
-                  self.term_size.get_rows(), self.visible_text_length)
->>>>>>> 9bc8c96 (Mainly fixed typos.)
 
     def _update_complete_text(self):
         blanks = self.num_blanks * " "
