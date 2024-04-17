@@ -27,6 +27,7 @@ existing, it can be created by passing the command line option: "-w"|"--write", 
 
 Using `SCROLL_DIRECTION=1` makes the text start scrolling from left-side of the terminal.
 This is used for right-to-left writing languages.
+<<<<<<< HEAD
 
 
 ### Using a different scrolling speed
@@ -73,3 +74,5 @@ TODO
  - renamed log-file to "scrolltext.log"
  - uses config file "scrolltextrc"
    \*NIX uses "~/.config/scrolltextrc", windows uses "scrolltextrc" in current directory
+=======
+>>>>>>> 9b37b6f (Removed some documentation...)
