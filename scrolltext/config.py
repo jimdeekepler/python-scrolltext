@@ -14,7 +14,7 @@ SCROLL_SPEEDS = [.25, .20, .18, .15, .125, .1, .09, .08, .075, .07, .0675]
 
 
 initial_config = {
-    "main": {"action": "linescroller", "endless": "0"},
+    "main": {"action": "linescroller", "color": 0, "endless": "0"},
     "cursestext": {"box": "1"},
     "scrolltext.text 1": {
         "direction": "0",
