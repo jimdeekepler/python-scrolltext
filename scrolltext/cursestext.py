@@ -18,8 +18,6 @@ def curses_scroller(win, cfg):
     :param cfg: Config object
     :type: configparser.ConfigParser
     """
-    if cfg["cursestext"].getboolean("box"):
-        win.box()
     if not IS_WINDOWS:
         curses.curs_set(0)  # Hide the cursor
 
@@ -101,6 +99,8 @@ def draw_items(win, box, min_scroll_line, scroller, term_size):
     """
     # clear the window contents
     win.clear()
+    if box:
+        win.box()
 
     # and redraw screen
     if scroller.line != 1 and term_size.get_cols() > len("Scroll-Text"):
