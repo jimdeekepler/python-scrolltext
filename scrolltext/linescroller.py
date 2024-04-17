@@ -38,6 +38,7 @@ def _linescroller(getch, cfg):
     """
     term_size = TermSize(0, 0)
     _update_term_size(term_size)
+    use_colors = cfg["main"].getboolean("color")
     argv = {}
     argv["min_scroll_line"] = 0
     scroller = CharacterScroller(cfg, term_size, **argv)
@@ -51,6 +52,8 @@ def _linescroller(getch, cfg):
             win_text = text
         else:
             win_text = text[:-1]
+        if use_colors:
+            win_text = _apply_colors(win_text)
         print(win_text, end="\r")
         if IS_WINDOWS:
             sleep(.15)
@@ -63,6 +66,17 @@ def _linescroller(getch, cfg):
                 _move_to_line(scroller.line)
     if IS_WINDOWS:
         print(f"{UP_ONE_ROW}", end="")
+
+
+def _apply_colors(win_text):
+    i = 31
+    new_text = ""
+    for ch in win_text:
+        new_text += f"\033[{i}m" + ch
+        i += 1
+        if i > 39:
+            i = 31
+    return new_text
 
 
 def _check_input(getch):
