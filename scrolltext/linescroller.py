@@ -95,14 +95,14 @@ def _linescroller(getch, cfg):
         print(f"{UP_ONE_ROW}", end="")
 
 
-def _apply_colors(win_text):
-    i = 31
+def _apply_colors(win_text, colortable, colortable_size):
+    color_index = 0
     new_text = ""
     for ch in win_text:
-        new_text += f"\033[{i}m" + ch
-        i += 1
-        if i > 39:
-            i = 31
+        log.debug("color-index: %d  color-code: %s", color_index, colortable[color_index])
+        new_text += f"\033[{colortable[color_index]}" + ch
+        color_index += 1
+        color_index = color_index % colortable_size
     return new_text
 
 
