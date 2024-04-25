@@ -11,30 +11,30 @@ if not IS_WINDOWS:
 
 
 DEFAULT_COLOR_TABLE_GREYSCALE_256 = [
-        "38,5,232m",
-        "38,5,233m",
-        "38,5,234m",
-        "38,5,235m",
-        "38,5,236m",
-        "38,5,237m",
-        "38,5,238m",
-        "38,5,239m",
-        "38,5,240m",
-        "38,5,241m",
-        "38,5,242m",
-        "38,5,243m",
-        "38,5,244m",
-        "38,5,245m",
-        "38,5,246m",
-        "38,5,247m",
-        "38,5,248m",
-        "38,5,249m",
-        "38,5,250m",
-        "38,5,251m",
-        "38,5,252m",
-        "38,5,253m",
-        "38,5,254m",
-        "38,5,255m"
+        "38;5;232m",
+        "38;5;233m",
+        "38;5;234m",
+        "38;5;235m",
+        "38;5;236m",
+        "38;5;237m",
+        "38;5;238m",
+        "38;5;239m",
+        "38;5;240m",
+        "38;5;241m",
+        "38;5;242m",
+        "38;5;243m",
+        "38;5;244m",
+        "38;5;245m",
+        "38;5;246m",
+        "38;5;247m",
+        "38;5;248m",
+        "38;5;249m",
+        "38;5;250m",
+        "38;5;251m",
+        "38;5;252m",
+        "38;5;253m",
+        "38;5;254m",
+        "38;5;255m"
         ]
 DEFAULT_COLOR_TABLE = DEFAULT_COLOR_TABLE_GREYSCALE_256
 last_term_rows = -1  # pylint: disable=C0103 (invalid-name)
@@ -69,26 +69,27 @@ def _linescroller(getch, cfg):
     argv = {}
     argv["min_scroll_line"] = 0
     scroller = CharacterScroller(cfg, term_size, **argv)
-    colortable = DEFAULT_COLOR_TABLE
+    colortable = _build_smooth_colortable(DEFAULT_COLOR_TABLE)
     colortable_size = len(colortable)
 
     print(f"{CLEAR}{HOME}", end="")
     if scroller.line > 0:
         _move_to_line(scroller.line)
     cnt = 0
+    offset = 2
     for text in scroller:
         if scroller.line < term_size.get_rows() - 1:
             win_text = text
         else:
             win_text = text[:-1]
         if use_colors:
-            win_text = _apply_colors(win_text, colortable, colortable_size)
+            win_text = _apply_colors(win_text, cnt, colortable, colortable_size)
         print(win_text, end="\r")
         if IS_WINDOWS:
             sleep(.15)
         else:
             _check_input(getch)
-        cnt += 1
+        cnt += offset
         if _update_term_size(term_size):
             print(f"{CLEAR}{HOME}", end="")
             if scroller.line > 0:
@@ -97,11 +98,18 @@ def _linescroller(getch, cfg):
         print(f"{UP_ONE_ROW}", end="")
 
 
-def _apply_colors(win_text, colortable, colortable_size):
-    color_index = 0
+def _build_smooth_colortable(color_table):
+    colors = color_table
+    for pos in range(len(colors) - 1, 0, -1):
+        colors.append(color_table[pos])
+    return colors
+
+
+def _apply_colors(win_text, cnt, colortable, colortable_size):
+    color_index = cnt % colortable_size
+    log.debug("color-index: %d  color-code: %s", color_index, colortable[color_index])
     new_text = ""
     for ch in win_text:
-        log.debug("color-index: %d  color-code: %s", color_index, colortable[color_index])
         new_text += f"\033[{colortable[color_index]}" + ch
         color_index += 1
         color_index = color_index % colortable_size
