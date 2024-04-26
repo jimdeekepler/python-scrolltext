@@ -4,13 +4,14 @@ A simple side scrolling text application.
 import logging
 import shutil
 from time import sleep
-from .utils import CLEAR, HOME, IS_WINDOWS, UP_ONE_ROW, CharacterScroller, TermSize
+from .utils import CLEAR, HOME, BOLD, NORMAL, IS_WINDOWS, UP_ONE_ROW, CharacterScroller, TermSize
 
 if not IS_WINDOWS:
     from scrolltext.getchtimeout import GetchWithTimeout
 
 
 DEFAULT_COLOR_TABLE_GREYSCALE_256 = ["38;5;" + str(x) + "m" for x in range(232,256)]
+DEFAULT_COLOR_TABLE_CONSOLE = [str(x) + "m" for x in [30, 34, 35, 36, 31, 32, 33]]
 DEFAULT_COLOR_TABLE = DEFAULT_COLOR_TABLE_GREYSCALE_256
 last_term_rows = -1  # pylint: disable=C0103 (invalid-name)
 log = logging.getLogger(__name__)
@@ -40,11 +41,15 @@ def _linescroller(getch, cfg):
     """
     term_size = TermSize(0, 0)
     _update_term_size(term_size)
+    use_bold = False
     use_colors = cfg["main"].getboolean("color")
     argv = {}
     argv["min_scroll_line"] = 0
     scroller = CharacterScroller(cfg, term_size, **argv)
     colortable = _build_smooth_colortable(DEFAULT_COLOR_TABLE)
+    if False:
+        use_bold = True
+        colortable = _build_smooth_colortable(DEFAULT_COLOR_TABLE_CONSOLE)
     colortable_size = len(colortable)
 
     print(f"{CLEAR}{HOME}", end="")
@@ -59,6 +64,8 @@ def _linescroller(getch, cfg):
             win_text = text[:-1]
         if use_colors:
             win_text = _apply_colors(win_text, cnt, colortable, colortable_size)
+        if use_bold:
+            win_text = BOLD + win_text
         print(win_text, end="\r")
         if IS_WINDOWS:
             sleep(.15)
