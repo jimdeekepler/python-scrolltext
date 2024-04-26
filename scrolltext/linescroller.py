@@ -87,7 +87,6 @@ def _build_smooth_colortable(color_table):
 
 def _apply_colors(win_text, cnt, colortable, colortable_size):
     color_index = cnt % colortable_size
-    log.debug("color-index: %d  color-code: %s", color_index, colortable[color_index])
     new_text = ""
     for ch in win_text:
         new_text += f"\033[{colortable[color_index]}" + ch
