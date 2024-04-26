@@ -10,6 +10,8 @@ from scrolltext.config import IS_WINDOWS  # pylint: disable=no-name-in-module (W
 
 CLEAR = "\033[2J"
 HOME = "\033[H"
+BOLD = "\033[1m"
+NORMAL = "\033[0m"
 UP_ONE_ROW = "\033[1A"
 
 
