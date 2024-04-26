@@ -107,6 +107,8 @@ def _check_input(getch):
     elif isinstance(character, str):
         log.debug("Got key '%s'", character)
     if character is not None and character in ["\033", "\x1b", "", "\r", "", " ", "Q", "q"]:
+        log.debug("Got key '%s'. Quitting.", character)
+        print(f"{NORMAL}")
         raise RuntimeError()
 
 
