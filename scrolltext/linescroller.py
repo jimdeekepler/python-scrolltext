@@ -111,7 +111,6 @@ def _check_user_keypress(getch):
     """
     character = getch.getch(timeout=.1)
     if character is not None and character in ["\033", "\x1b", "", "\r", "", " ", "Q", "q"]:
-        log.debug("Got key '%s'. Quitting.", character)
         print(f"{NORMAL}")
         raise RuntimeError()
 
