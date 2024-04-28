@@ -53,9 +53,6 @@ def do_textloop(win, cfg, term_size, scroller, min_scroll_line):
         character = get_char(win)
         if character == curses.KEY_EXIT:
             return
-        if character == curses.KEY_RESIZE:
-            update_term_size(win, box, term_size)
-            draw_items(win, box, min_scroll_line, scroller, term_size)
 
 
 def add_quit_text(win, box, line, term_size):
@@ -114,6 +111,16 @@ def _addstr_wrapper(win, row, column, text):
         win.addstr(row, column, text)
     except:  # pylint: disable=W0702 (bare-except)
         pass
+
+
+def _check_quit(win, box, term_size, min_scroll_line, scroller):
+    character = get_char(win)
+    if character == curses.KEY_EXIT:
+        return True
+    if character == curses.KEY_RESIZE:
+        update_term_size(win, box, term_size)
+        draw_items(win, box, min_scroll_line, scroller, term_size)
+    return False
 
 
 def work(cfg):
