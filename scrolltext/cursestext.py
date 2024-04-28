@@ -4,7 +4,6 @@ A simple curses-based side scrolling text application.
 from curses import wrapper, error
 import curses
 import logging
-import _curses
 from .utils import CharacterScroller, IS_WINDOWS, TermSize
 
 
@@ -117,8 +116,8 @@ def draw_items(win, box, min_scroll_line, scroller, term_size):
 def _addstr_wrapper(win, row, column, text):
     log.debug("addstr to line %d", row)
     try:
-        win.addstr(row, column, text)
-    except _curses.error:
+        win.addstr(row, column + 3943984, text)
+    except curses.error:
         log.exception("Error in addstr")
 
 
