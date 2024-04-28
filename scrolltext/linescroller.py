@@ -11,7 +11,7 @@ if not IS_WINDOWS:
 
 DEFAULT_COLOR_TABLE_GREYSCALE_256 = ["38;5;" + str(x) + "m" for x in range(232,256)]
 DEFAULT_COLOR_TABLE_CONSOLE = [str(x) + "m" for x in [30, 34, 35, 36, 31, 32, 33]]
-DEFAULT_COLOR_TABLE = DEFAULT_COLOR_TABLE_GREYSCALE_256
+COLOR_TABLES = [DEFAULT_COLOR_TABLE_GREYSCALE_256, DEFAULT_COLOR_TABLE_CONSOLE]
 last_term_rows = -1  # pylint: disable=C0103 (invalid-name)
 
 
@@ -44,10 +44,9 @@ def _linescroller(getch, cfg):
     argv = {}
     argv["min_scroll_line"] = 0
     scroller = CharacterScroller(cfg, term_size, **argv)
-    colortable = _build_smooth_colortable(DEFAULT_COLOR_TABLE)
-    if False:
+    colortable = _build_smooth_colortable(cfg)
+    if cfg["main"].getboolean("bold"):
         use_bold = True
-        colortable = _build_smooth_colortable(DEFAULT_COLOR_TABLE_CONSOLE)
     colortable_size = len(colortable)
 
     print(f"{CLEAR}{HOME}", end="")
@@ -78,7 +77,11 @@ def _linescroller(getch, cfg):
         print(f"{UP_ONE_ROW}", end="")
 
 
-def _build_smooth_colortable(color_table):
+def _build_smooth_colortable(cfg):
+    color_table_id = cfg["main"].getint("colortable", 0)
+    if color_table_id < 0 or color_table_id >= len(COLOR_TABLES):
+        color_table_id = 0
+    color_table = COLOR_TABLES[color_table_id]
     colors = color_table
     for pos in range(len(colors) - 1, 0, -1):
         colors.append(color_table[pos])
