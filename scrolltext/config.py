@@ -61,10 +61,10 @@ def _read_config(config_path):
     """
     really_write = False
     cfg = configparser.ConfigParser(default_section="main")
-    read_config_files = cfg.read(config_path)
-
-    if not read_config_files:
-        really_write = True
+    successfully_read_files = cfg.read(config_path)
+    if not successfully_read_files:
+        really_write = True  # We only write a config file, when it does not already exist.
+        log.info("No config file found")
         cfg.update(initial_config)
     _validate(cfg)
     return cfg, really_write
