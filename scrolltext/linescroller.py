@@ -26,29 +26,30 @@ def linescroller(cfg):
     getch = None
     if not IS_WINDOWS:
         getch = GetchWithTimeout()
+
+    term_size = TermSize(0, 0)
+    _update_term_size(term_size)
     try:
-        _linescroller(getch, cfg)
+        _linescroller(getch, cfg, term_size)
     except RuntimeError:
         pass
     finally:
         if not IS_WINDOWS:
             getch.cleanup()
+        else:
+            print(f"{UP_ONE_ROW}", end="")
 
 
-def _linescroller(getch, cfg):
+def _linescroller(getch, cfg, term_size):
     """
     Prints a text in a side-scrolling manner.
     """
-    term_size = TermSize(0, 0)
-    _update_term_size(term_size)
-    use_bold = False
-    use_colors = cfg["main"].getboolean("color")
     argv = {}
     argv["min_scroll_line"] = 0
     scroller = CharacterScroller(cfg, term_size, **argv)
+    use_colors = cfg["main"].getboolean("color")
+    use_bold = cfg["main"].getboolean("bold")
     colortable = _build_smooth_colortable(cfg)
-    if cfg["main"].getboolean("bold"):
-        use_bold = True
     colortable_size = len(colortable)
 
     print(f"{CLEAR}{HOME}", end="")
@@ -61,22 +62,12 @@ def _linescroller(getch, cfg):
             win_text = text
         else:
             win_text = text[:-1]
-        if use_colors:
-            win_text = _apply_colors(win_text, cnt, colortable, colortable_size)
-        if use_bold:
-            win_text = BOLD + win_text
+        win_text = _add_ansi_escapes(win_text, cnt, use_bold, use_colors, colortable,
+                                     colortable_size)
         print(win_text, end="\r")
-        if IS_WINDOWS:
-            sleep(.15)
-        else:
-            _check_input(getch)
+        _check_input(getch)
         cnt += offset
-        if _update_term_size(term_size):
-            print(f"{CLEAR}{HOME}", end="")
-            if scroller.line > 0:
-                _move_to_line(scroller.line)
-    if IS_WINDOWS:
-        print(f"{UP_ONE_ROW}", end="")
+        _check_term_resize(scroller, term_size)
 
 
 def _build_smooth_colortable(cfg):
@@ -90,6 +81,15 @@ def _build_smooth_colortable(cfg):
     return colors
 
 
+# pylint: disable=too-many-arguments (R0913)
+def _add_ansi_escapes(win_text, cnt, use_bold, use_colors, colortable, colortable_size):
+    if use_colors:
+        win_text = _apply_colors(win_text, cnt, colortable, colortable_size)
+    if use_bold:
+        win_text = BOLD + win_text
+    return win_text
+
+
 def _apply_colors(win_text, cnt, colortable, colortable_size):
     color_index = cnt % colortable_size
     new_text = ""
@@ -101,6 +101,13 @@ def _apply_colors(win_text, cnt, colortable, colortable_size):
 
 
 def _check_input(getch):
+    if IS_WINDOWS:
+        sleep(.15)
+    else:
+        _check_user_keypress(getch)
+
+
+def _check_user_keypress(getch):
     """
     Use getchtimeout to get a character. If "Q" or "q" is given, then it raises SystemExit
     """
@@ -126,6 +133,13 @@ def _move_to_line(line):
     else:
         for _ in range(line):
             print("\033[1B", end="")
+
+
+def _check_term_resize(scroller, term_size):
+    if _update_term_size(term_size):
+        print(f"{CLEAR}{HOME}", end="")
+        if scroller.line > 0:
+            _move_to_line(scroller.line)
 
 
 def _update_term_size(term_size):
