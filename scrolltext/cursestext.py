@@ -5,6 +5,7 @@ from curses import wrapper, error
 import curses
 from .utils import CharacterScroller, IS_WINDOWS, TermSize
 
+import _curses
 
 QUIT_CHARACTERS = ["\x1B", "Q", "q"]
 
@@ -112,7 +113,8 @@ def draw_items(win, box, min_scroll_line, scroller, term_size):
 def _addstr_wrapper(win, row, column, text):
     try:
         win.addstr(row, column, text)
-    except:  # pylint: disable=W0702 (bare-except)
+    except _curses.error:
+        log.exception("Error in addstr")
         pass
 
 
