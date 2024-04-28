@@ -10,7 +10,7 @@ if not IS_WINDOWS:
     from scrolltext.getchtimeout import GetchWithTimeout
 
 
-DEFAULT_COLOR_TABLE_GREYSCALE_256 = ["38;5;" + str(x) + "m" for x in range(232,256)]
+DEFAULT_COLOR_TABLE_GREYSCALE_256 = ["38;5;" + str(x) + "m" for x in range(232, 256)]
 DEFAULT_COLOR_TABLE_CONSOLE = [str(x) + "m" for x in [30, 34, 35, 36, 31, 32, 33]]
 COLOR_TABLES = [DEFAULT_COLOR_TABLE_GREYSCALE_256, DEFAULT_COLOR_TABLE_CONSOLE]
 last_term_rows = -1  # pylint: disable=C0103 (invalid-name)
