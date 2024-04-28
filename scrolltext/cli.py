@@ -28,9 +28,9 @@ def main():
         action = action or _str_to_action_type(cfg["main"]["action"])
         action(cfg)
     except KeyError as e:
-        print("KeyError occured: " + str(e) + "\nProbalby check config?")
+        print("KeyError occurred: " + str(e) + "\nYou probably want to update 'scrolltextrc'.")
     except NameError as e:
-        print("NameError occured: " + str(e))
+        print("NameError occurred: " + str(e) + "\nYou probably want to update 'scrolltextrc'.")
 
 
 def _parse_args():  # pylint: disable=inconsistent-return-statements  (R1710)
