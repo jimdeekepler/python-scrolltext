@@ -6,6 +6,7 @@ import curses
 import logging
 from .utils import CharacterScroller, IS_WINDOWS, TermSize
 
+import _curses
 
 QUIT_CHARACTERS = ["\x1B", "Q", "q"]
 
@@ -128,7 +129,7 @@ def _addstr_wrapper(win, row, column, text):
     log.debug("addstr to line %d", row)
     try:
         win.addstr(row, column, text)
-    except:  # pylint: disable=W0702 (bare-except)
+    except _curses.error:
         log.exception("Error in addstr")
 
 
