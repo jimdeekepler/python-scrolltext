@@ -5,7 +5,6 @@ from curses import wrapper, error
 import curses
 from .utils import CharacterScroller, IS_WINDOWS, TermSize
 
-import _curses
 
 QUIT_CHARACTERS = ["\x1B", "Q", "q"]
 
@@ -54,9 +53,6 @@ def do_textloop(win, cfg, term_size, scroller, min_scroll_line):
         character = get_char(win)
         if character == curses.KEY_EXIT:
             return
-        if character == curses.KEY_RESIZE:
-            update_term_size(win, box, term_size)
-            draw_items(win, box, min_scroll_line, scroller, term_size)
 
 
 def add_quit_text(win, box, line, term_size):
@@ -116,6 +112,30 @@ def _addstr_wrapper(win, row, column, text):
     except _curses.error:
         log.exception("Error in addstr")
         pass
+
+
+def _check_quit(win, box, term_size, min_scroll_line, scroller):
+    character = get_char(win)
+    if character == curses.KEY_EXIT:
+        return True
+    if character == curses.KEY_RESIZE:
+        update_term_size(win, box, term_size)
+        draw_items(win, box, min_scroll_line, scroller, term_size)
+    return False
+
+
+# pylint: disable=too-many-arguments (R0913)
+def _draw_text(win, scroller, term_size, box, win_text, min_scroll_line, term_too_small_printed):
+    if scroller.line >= min_scroll_line:
+        _addstr_wrapper(win, scroller.line, (1 if box else 0), win_text)
+        term_too_small_printed = False
+        win.redrawwin()
+    else:
+        if not term_too_small_printed:
+            log.debug("Terminal is too small  cols: %d  rows: %d",
+                      term_size.get_cols(), term_size.get_rows())
+        term_too_small_printed = True
+    return term_too_small_printed
 
 
 def work(cfg):
