@@ -1,6 +1,7 @@
 """
 Utilities for line-based text scrollers.
 """
+import sys
 from os import getenv
 from time import time
 from scrolltext.config import get_speedsec_float, init_config
@@ -74,15 +75,11 @@ def _override_from_env(cfg):
 
 
 def _override_verbose(cfg):
-    verbose = getenv("VERBOSE") == "1"
-    if verbose:
-        cfg["main"]["verbose"] = "1"
+    _check_and_override_boolean_var(cfg, "VERBOSE", ["main", "verbose"])
 
 
 def _override_scroll_box(cfg):
-    scroll_direction = getenv("SCROLL_BOX") == "1"
-    if scroll_direction:
-        cfg["cursestext"]["box"] = "1"
+    _check_and_override_boolean_var(cfg, "SCROLL_BOX", ["cursestext", "box"])
 
 
 def _override_scroll_direction(cfg):
@@ -97,6 +94,8 @@ def _override_scroll_direction(cfg):
 def _override_scroll_line(cfg):
     scroll_line_str = getenv("SCROLL_LINE")
     if scroll_line_str:
+        if EARLY_VERBOSE:
+            print("Using env-var 'SCROLL_LINE_STR'", file=sys.stderr)
         cfg["scrolltext.text 1"]["line"] = scroll_line_str
 
 
@@ -104,6 +103,9 @@ def _override_scroll_speed(cfg):
     scroll_speed = getenv("SCROLL_SPEED")
     if scroll_speed:
         scroll_speed_index = parse_int(getenv("SCROLL_SPEED"))
+        if EARLY_VERBOSE:
+            # pylint: disable=C0209  (consider-using-f-string)
+            print("Using env-var 'SCROLL_SPEED' with '{}'".format(scroll_speed), file=sys.stderr)
         cfg["scrolltext.text 1"]["speed"] = str(scroll_speed_index)
 
 
