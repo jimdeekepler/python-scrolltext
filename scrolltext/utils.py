@@ -2,18 +2,19 @@
 Utilities for line-based text scrollers.
 """
 import logging
+import sys
 from os import getenv
 from time import time
 from scrolltext.config import get_speedsec_float, init_config
 from scrolltext.config import IS_WINDOWS  # pylint: disable=no-name-in-module (W0611)
 
 
+EARLY_VERBOSE = getenv("VERBOSE")
 CLEAR = "\033[2J"
 HOME = "\033[H"
 BOLD = "\033[1m"
 NORMAL = "\033[0m"
 UP_ONE_ROW = "\033[1A"
-
 
 log = logging.getLogger(__name__)
 
@@ -87,37 +88,30 @@ def _override_from_env(cfg):
 
 
 def _override_verbose(cfg):
-    verbose = getenv("VERBOSE") == "1"
-    if verbose:
-        log.debug("Using env-var 'VERBOSE'")
-        cfg["main"]["verbose"] = "1"
+    _check_and_override_boolean_var(cfg, "VERBOSE", ["main", "verbose"])
 
 
 def _override_scroll_box(cfg):
-    scroll_direction = getenv("SCROLL_BOX") == "1"
-    if scroll_direction:
-        log.debug("Using env-var 'SCROLL_BOX'")
-        cfg["cursestext"]["box"] = "1"
+    _check_and_override_boolean_var(cfg, "SCROLL_BOX", ["cursestext", "box"])
 
 
 def _override_scroll_direction(cfg):
-    scroll_direction = getenv("SCROLL_DIRECTION") == "1"
-    if scroll_direction:
-        log.debug("Using env-var 'SCROLL_DIRECTION'")
-        cfg["scrolltext.text 1"]["direction"] = "1"
+    _check_and_override_boolean_var(cfg, "SCROLL_DIRECTION", ["scrolltext.text 1", "direction"])
 
 
 def _override_scroll_text(cfg):
     scroll_text = getenv("SCROLL_TEXT")
     if scroll_text:
-        log.debug("Using env-var 'SCROLL_TEXT'")
+        if EARLY_VERBOSE:
+            print("Using env-var 'SCROLL_TEXT'", file=sys.stderr)
         cfg["scrolltext.text 1"]["text"] = scroll_text
 
 
 def _override_scroll_line(cfg):
     scroll_line_str = getenv("SCROLL_LINE")
     if scroll_line_str:
-        log.debug("Using env-var 'SCROLL_LINE_STR'")
+        if EARLY_VERBOSE:
+            print("Using env-var 'SCROLL_LINE_STR'", file=sys.stderr)
         cfg["scrolltext.text 1"]["line"] = scroll_line_str
 
 
@@ -125,8 +119,30 @@ def _override_scroll_speed(cfg):
     scroll_speed = getenv("SCROLL_SPEED")
     if scroll_speed:
         scroll_speed_index = parse_int(getenv("SCROLL_SPEED"))
-        log.debug("Using env-var 'SCROLL_SPEED' with '%s'", scroll_speed)
+        if EARLY_VERBOSE:
+            # pylint: disable=C0209  (consider-using-f-string)
+            print("Using env-var 'SCROLL_SPEED' with '{}'".format(scroll_speed), file=sys.stderr)
         cfg["scrolltext.text 1"]["speed"] = str(scroll_speed_index)
+
+
+def _check_and_override_boolean_var(cfg, var_name, *args):
+    env_value = getenv(var_name)
+    if env_value is None:
+        return
+    if len(*args) < 2:
+        raise RuntimeError("Need  2 args in _check_and_override_boolean_var.")
+
+    section, option = args[0][0], args[0][1]
+    if env_value == "1":
+        if EARLY_VERBOSE:
+            # pylint: disable=C0209  (consider-using-f-string)
+            print("Using env-var '{}' = {}".format(var_name, env_value), file=sys.stderr)
+        cfg.set(section, option, "1")
+    else:
+        if EARLY_VERBOSE:
+            # pylint: disable=C0209  (consider-using-f-string)
+            print("Assuming env-var '{}'={} is False".format(var_name, env_value), file=sys.stderr)
+        cfg.set(section, option, "0")
 
 
 class TermSize:
