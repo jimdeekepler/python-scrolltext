@@ -20,7 +20,7 @@ def parse_int(var):
     """
     Calls int on var, ignores TypeError and ValueError.
 
-    :returns: Integer value given in var string, 0 if one of the forementioned errors occurs.
+    :returns: Integer value given in var string, 0 if one of the aforementioned errors occurs.
     :rtype: int
     """
     try:
@@ -33,7 +33,7 @@ def parse_int(var):
 
 def init_utils(write_config):
     """
-    Initialises config object and updates some configs via environment varialbes, if
+    Initialises config object and updates some configurations via environment variables, if
     set.
     :param write_config: Write initial config
     :type: bool
@@ -66,7 +66,7 @@ def get_linenum(scroll_line_str, min_row, max_row):
 
 
 def _override_from_env(cfg):
-    _override_verbose(cfg)  # x x x  todo: recap (all of those ...)
+    _override_verbose(cfg)
     _override_scroll_box(cfg)
     _override_scroll_direction(cfg)
     _override_scroll_text(cfg)
@@ -151,7 +151,7 @@ class TermSize:
     def set_size(self, cols, rows):
         """
         Checks if the terminal window size has changed, and sets the
-        new term columns and rows paramters. Also sets the resized flag.
+        new term columns and rows parameters. Also sets the resized flag.
         """
         if self.term_columns != cols:
             self.term_columns = cols
@@ -190,7 +190,7 @@ class CharacterScroller:  # pylint: disable=R0902  # disable (too-many-instance-
         :type: TermSize
         :param argv["section_index"]: Number of scrolltext.text section in use [1..3]
         :param argv["min_scroll_line"]: The minimum terminal row allowed
-        :param argv["test"]: Only used in unittests
+        :param argv["test"]: Only used in unit tests
         """
         self.term_size = term_size
         self.min_scroll_line = argv["min_scroll_line"] if "min_scroll_line" in argv else 0
@@ -226,8 +226,17 @@ class CharacterScroller:  # pylint: disable=R0902  # disable (too-many-instance-
                                 self.min_scroll_line, self.term_size.get_rows())
         if self.term_size.get_cols() != self.visible_text_length:
             self.visible_text_length = self.term_size.get_cols()
+<<<<<<< HEAD
             self.num_blanks = argv["blanks"] if "blanks" in argv else self.visible_text_length
             self._update_complete_text()
+=======
+            log.debug("visible_text_length: %d", self.visible_text_length)
+            self.num_blanks = argv["blanks"] if "blanks" in argv else self.visible_text_length
+            self._update_complete_text()
+        log.debug("_resized  line: %d  columns: %d  rows: %d  text-length %d",
+                  self.line, self.term_size.get_cols(),
+                  self.term_size.get_rows(), self.visible_text_length)
+>>>>>>> 9bc8c96 (Mainly fixed typos.)
 
     def _update_complete_text(self):
         blanks = self.num_blanks * " "
