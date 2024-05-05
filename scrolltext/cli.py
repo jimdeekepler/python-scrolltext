@@ -15,7 +15,7 @@ scrolltext [-w|--write] action
     action      cursestext or linescroller
 
 """
-VERSION = "scrolltext v0.0.8"  # possible improvement: use importlib metadata?
+VERSION = "scrolltext v0.0.11"  # possible improvement: use importlib metadata?
 
 
 def main():
