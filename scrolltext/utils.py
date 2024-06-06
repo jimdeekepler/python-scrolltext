@@ -86,8 +86,9 @@ def _override_scroll_direction(cfg):
     scroll_direction = getenv("SCROLL_DIRECTION") == "1"
     if scroll_direction:
         cfg["scrolltext.text 1"]["direction"] = "1"
-        if EARLY_VERBOSE:
-            print("Using env-var 'SCROLL_TEXT'", file=sys.stderr)
+
+
+def _override_scroll_text(cfg):
         cfg["scrolltext.text 1"]["text"] = scroll_text
 
 
