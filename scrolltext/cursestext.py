@@ -57,8 +57,7 @@ def do_textloop(win, cfg, term_size, scroller, min_scroll_line):
         #       moving the text upwards, by removing the last character of the visibile text.
         if not box and scroller.line == term_size.get_rows():
             win_text = text[:-1]
-        term_too_small_printed = _draw_text(win, cfg, scroller, term_size, box, win_text,
-                                            min_scroll_line, term_too_small_printed)
+        _draw_text(win, cfg, scroller, term_size, box, win_text, min_scroll_line)
         if _check_quit(win, box, term_size, min_scroll_line, scroller):
             return
 
@@ -173,11 +172,7 @@ def _draw_text(win, cfg, scroller, term_size, box,
             _addstr_with_colors_wrapper(win, scroller.line, (1 if box else 0), win_text)
         else:
             _addstr_wrapper(win, scroller.line, (1 if box else 0), win_text)
-        term_too_small_printed = False
         win.redrawwin()
-    else:
-        term_too_small_printed = True
-    return term_too_small_printed
 
 
 def _init_colors():
