@@ -7,7 +7,9 @@ import logging
 from .utils import CharacterScroller, IS_WINDOWS, TermSize
 
 
+NUM_COLORS = 0
 QUIT_CHARACTERS = ["\x1B", "Q", "q"]
+START_INDEX = 2
 
 
 log = logging.getLogger(__name__)
@@ -22,8 +24,15 @@ def curses_scroller(win, cfg):
     :param cfg: Config object
     :type: configparser.ConfigParser
     """
+    global NUM_COLORS  # pylint: disable=W0603 (global-statement)
     if not IS_WINDOWS:
         curses.curs_set(0)  # Hide the cursor
+    if curses.has_colors():
+        log.debug("curses has colors %d", curses.COLORS)
+        NUM_COLORS = cfg["cursestext"].getint("num_colors", 18)
+        NUM_COLORS = min(NUM_COLORS, curses.COLORS - 2)
+        _init_colors()
+        log.info("using %d colors", curses.COLORS)
 
     term_size = TermSize(0, 0)
     update_term_size(win, cfg["cursestext"].getboolean("box"), term_size)
@@ -121,6 +130,36 @@ def _addstr_wrapper(win, row, column, text):
         log.exception("Error in addstr")
 
 
+def _addstr_with_colors_wrapper(win, row, column, text, /, *args):
+    global START_INDEX  # pylint: disable=W0603 (global-statement)
+    color_index = START_INDEX
+
+    log.debug("addstr to line %d", row)
+    try:
+        pos = column
+        count_up = True
+        for character in text:
+            win.addstr(row, pos, character, curses.color_pair(color_index), *args)
+            log.debug("using color index: %d", color_index)
+            pos += 1
+            if count_up:
+                color_index += 1
+                if color_index >= NUM_COLORS - 1:
+                    count_up = False
+            else:
+                color_index -= 1
+                if color_index <= 2:
+                    count_up = True
+    except curses.error:
+        log.exception("Error in addstr")
+
+    START_INDEX += 1
+    if ((START_INDEX - 2) % (2 * NUM_COLORS)) == (2 * NUM_COLORS) - 1:
+        START_INDEX = 2
+    elif START_INDEX < 2:
+        START_INDEX = (2 * NUM_COLORS) - 1
+
+
 def _check_quit(win, box, term_size, min_scroll_line, scroller):
     character = get_char(win)
     if character == curses.KEY_EXIT:
@@ -134,7 +173,7 @@ def _check_quit(win, box, term_size, min_scroll_line, scroller):
 # pylint: disable=too-many-arguments (R0913)
 def _draw_text(win, scroller, term_size, box, win_text, min_scroll_line, term_too_small_printed):
     if scroller.line >= min_scroll_line:
-        _addstr_wrapper(win, scroller.line, (1 if box else 0), win_text)
+        _addstr_with_colors_wrapper(win, scroller.line, (1 if box else 0), win_text)
         term_too_small_printed = False
         win.redrawwin()
     else:
@@ -145,8 +184,31 @@ def _draw_text(win, scroller, term_size, box, win_text, min_scroll_line, term_to
     return term_too_small_printed
 
 
+def _log_default_color_indexes():
+    log.info(curses.COLOR_BLACK)
+    log.info(curses.COLOR_RED)
+    log.info(curses.COLOR_GREEN)
+    log.info(curses.COLOR_YELLOW)
+    log.info(curses.COLOR_BLUE)
+    log.info(curses.COLOR_MAGENTA)
+    log.info(curses.COLOR_CYAN)
+    log.info(curses.COLOR_WHITE)
+    log.info(curses.color_content(curses.COLOR_YELLOW))
+
+
+def _init_colors():
+    curses.start_color()
+    low_color = 280
+    color_increase = (1000 - low_color) / NUM_COLORS
+    for val in range(2, NUM_COLORS + 2):
+        color_value = int(low_color + (val - 2) * color_increase)
+        curses.init_color(val, color_value, color_value, color_value)
+        curses.init_pair(val, val, curses.COLOR_BLACK)
+        log.debug("initialized color index: %d", val)
+
+
 def work(cfg):
-    """Main usese curses.wrapper. See curses doc for details.
+    """Main uses curses.wrapper. See curses doc for details.
     """
     try:  # noqa: C901 ignoring 'TryExcept 42' is too complex - fix later
         wrapper(curses_scroller, cfg)
