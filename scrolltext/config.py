@@ -8,8 +8,8 @@ import sys
 
 IS_WINDOWS = sys.platform in ["msys", "win32", "nt"]
 DEF_SCROLL_TEXT = """\
-Hello, this is a  classic side scrolling text. You can override it by setting the \
-environment variable 'SCROLL_TEXT'. It is supposed to be a simple example."""
+Hello, this is a  classic side scrolling text. It can be configured via the 'scolltextrc' \
+config file. Find it in ~/.config/scrolltextrc or in the current working directory."""
 SCROLL_SPEEDS = [.25, .20, .18, .15, .125, .1, .09, .08, .075, .07, .0675]
 
 
