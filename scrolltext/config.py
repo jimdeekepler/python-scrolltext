@@ -19,7 +19,7 @@ initial_config = {
     "scrolltext.text 1": {
         "direction": "0",
         "text": DEF_SCROLL_TEXT,
-        "line": "0",
+        "line": "-4",
         "speed": "0",
     }
 }
