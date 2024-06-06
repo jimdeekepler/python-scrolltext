@@ -89,6 +89,8 @@ def _override_scroll_direction(cfg):
 
 
 def _override_scroll_text(cfg):
+    scroll_text = getenv("SCROLL_TEXT")
+    if scroll_text:
         cfg["scrolltext.text 1"]["text"] = scroll_text
 
 
