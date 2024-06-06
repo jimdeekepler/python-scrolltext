@@ -108,7 +108,7 @@ def draw_items(win, box, min_scroll_line, scroller, term_size):
 
 def _addstr_wrapper(win, row, column, text):
     try:
-        win.addstr(row, column + 3943984, text)
+        win.addstr(row, column, text)
     except curses.error:
         log.exception("Error in addstr")
         pass
