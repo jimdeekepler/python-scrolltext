@@ -173,7 +173,10 @@ def _check_quit(win, box, term_size, min_scroll_line, scroller):
 # pylint: disable=too-many-arguments (R0913)
 def _draw_text(win, scroller, term_size, box, win_text, min_scroll_line, term_too_small_printed):
     if scroller.line >= min_scroll_line:
-        _addstr_with_colors_wrapper(win, scroller.line, (1 if box else 0), win_text)
+        if curses.has_colors():
+            _addstr_with_colors_wrapper(win, scroller.line, (1 if box else 0), win_text)
+        else:
+            _addstr_wrapper(win, scroller.line, (1 if box else 0), win_text)
         term_too_small_printed = False
         win.redrawwin()
     else:
