@@ -25,15 +25,11 @@ def curses_scroller(win, cfg):
     if not IS_WINDOWS:
         curses.curs_set(0)  # Hide the cursor
     use_color = cfg["main"].getboolean("color", 0)
-    log.debug("use color: %d", use_color)
     if use_color and curses.has_colors():
-        log.debug("curses has colors %d", curses.COLORS)
-        log.debug("curses can change color %d", curses.can_change_color())
         NUM_COLORS = cfg["cursestext"].getint("num_colors", 18)
         NUM_COLORS = min(NUM_COLORS, curses.COLORS - 2)
         if curses.can_change_color():
             _init_colors()
-        log.info("using %d colors", NUM_COLORS)
 
     term_size = TermSize(0, 0)
     update_term_size(win, cfg["cursestext"].getboolean("box"), term_size)
@@ -129,13 +125,11 @@ def _addstr_with_colors_wrapper(win, row, column, text, /, *args):
     global START_INDEX, COLOR_UP  # pylint: disable=W0603 (global-statement)
     color_index = START_INDEX
 
-    log.debug("addstr to line %d", row)
     try:
         pos = column
         count_up = True
         for character in text:
             win.addstr(row, pos, character, curses.color_pair(color_index), *args)
-            log.debug("using color index: %d", color_index)
             pos += 1
             if count_up:
                 color_index += 1
@@ -146,7 +140,7 @@ def _addstr_with_colors_wrapper(win, row, column, text, /, *args):
                 if color_index <= 2:
                     count_up = True
     except curses.error:
-        log.exception("Error in addstr")
+        pass
 
     if COLOR_UP:
         START_INDEX += 1
@@ -182,9 +176,6 @@ def _draw_text(win, cfg, scroller, term_size, box,
         term_too_small_printed = False
         win.redrawwin()
     else:
-        if not term_too_small_printed:
-            log.debug("Terminal is too small  cols: %d  rows: %d",
-                      term_size.get_cols(), term_size.get_rows())
         term_too_small_printed = True
     return term_too_small_printed
 
@@ -197,7 +188,6 @@ def _init_colors():
         color_value = int(low_color + (val - 2) * color_increase)
         curses.init_color(val, color_value, color_value, color_value)
         curses.init_pair(val, val, curses.COLOR_BLACK)
-        log.debug("initialized color index: %d  with color value: %d", val, color_value)
 
 
 def work(cfg):
