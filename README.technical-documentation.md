@@ -57,6 +57,12 @@ Fastest scrolling speed.
 
 ## Changes
 
+### v0.0.11
+
+ - added color animation to cursestext
+ - updated default config
+ - some refactoring
+
 ### v0.0.10
 
  - added config option for color (only linescroller)
