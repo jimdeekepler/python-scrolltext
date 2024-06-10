@@ -240,7 +240,7 @@ class CharacterScroller:  # pylint: disable=R0902  # disable (too-many-instance-
 
     def _update_complete_text(self):
         blanks = self.num_blanks * " "
-        self.complete_text = blanks + self.scroll_text + (blanks if not self.endless else "")
+        self.complete_text = blanks + self.scroll_text + (blanks if not self.endless else "    ")
 
     def next(self):
         """
