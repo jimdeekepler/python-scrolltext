@@ -26,7 +26,6 @@ def curses_scroller(win, cfg):
     use_color = cfg["main"].getboolean("color", 0)
     log.debug("use color: %d", use_color)
     if use_color and curses.has_colors():
-        _log_default_color_indexes()
         log.debug("curses has colors %d", curses.COLORS)
         log.debug("curses can change color %d", curses.can_change_color())
         NUM_COLORS = cfg["cursestext"].getint("num_colors", 18)
@@ -183,18 +182,6 @@ def _draw_text(win, cfg, scroller, term_size, box,
                       term_size.get_cols(), term_size.get_rows())
         term_too_small_printed = True
     return term_too_small_printed
-
-
-def _log_default_color_indexes():
-    log.info(curses.COLOR_BLACK)
-    log.info(curses.COLOR_RED)
-    log.info(curses.COLOR_GREEN)
-    log.info(curses.COLOR_YELLOW)
-    log.info(curses.COLOR_BLUE)
-    log.info(curses.COLOR_MAGENTA)
-    log.info(curses.COLOR_CYAN)
-    log.info(curses.COLOR_WHITE)
-    log.info(curses.color_content(curses.COLOR_YELLOW))
 
 
 def _init_colors():
