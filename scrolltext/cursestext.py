@@ -57,7 +57,7 @@ def do_textloop(win, cfg, term_size, scroller, min_scroll_line):
         #       moving the text upwards, by removing the last character of the visibile text.
         if not box and scroller.line == term_size.get_rows():
             win_text = text[:-1]
-        _draw_text(win, cfg, scroller, term_size, box, win_text, min_scroll_line)
+        _draw_text(win, cfg, scroller, box, win_text, min_scroll_line)
         if _check_quit(win, box, term_size, min_scroll_line, scroller):
             return
 
@@ -164,11 +164,10 @@ def _check_quit(win, box, term_size, min_scroll_line, scroller):
 
 
 # pylint: disable=too-many-arguments (R0913)
-def _draw_text(win, cfg, scroller, term_size, box,
-               win_text, min_scroll_line, term_too_small_printed):
+def _draw_text(win, cfg, scroller, box, win_text, min_scroll_line):
     if scroller.line >= min_scroll_line:
-        if (cfg["main"].getboolean("color", 0)
-           and curses.has_colors() and curses.can_change_color()):
+        if (cfg["main"].getboolean("color", 0) and
+           curses.has_colors() and curses.can_change_color()):
             _addstr_with_colors_wrapper(win, scroller.line, (1 if box else 0), win_text)
         else:
             _addstr_wrapper(win, scroller.line, (1 if box else 0), win_text)
