@@ -30,6 +30,7 @@ def curses_scroller(win, cfg):
     use_color = cfg["main"].getboolean("color", 0)
     log.debug("use color: %d", use_color)
     if use_color and curses.has_colors():
+        _log_default_color_indexes()
         log.debug("curses has colors %d", curses.COLORS)
         log.debug("curses can change color %d", curses.can_change_color())
         NUM_COLORS = cfg["cursestext"].getint("num_colors", 18)
