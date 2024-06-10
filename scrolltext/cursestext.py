@@ -185,7 +185,7 @@ def _draw_text(win, cfg, scroller, term_size, box,
                win_text, min_scroll_line, term_too_small_printed):
     if scroller.line >= min_scroll_line:
         if (cfg["main"].getboolean("color", 0)
-            and curses.has_colors() and curses.can_change_color()):
+           and curses.has_colors() and curses.can_change_color()):
             _addstr_with_colors_wrapper(win, scroller.line, (1 if box else 0), win_text)
         else:
             _addstr_wrapper(win, scroller.line, (1 if box else 0), win_text)
