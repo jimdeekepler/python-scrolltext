@@ -10,6 +10,7 @@ from .utils import CharacterScroller, IS_WINDOWS, TermSize
 NUM_COLORS = 0
 QUIT_CHARACTERS = ["\x1B", "Q", "q"]
 START_INDEX = 2
+COLOR_UP = True
 
 
 log = logging.getLogger(__name__)
@@ -135,7 +136,7 @@ def _addstr_wrapper(win, row, column, text):
 
 
 def _addstr_with_colors_wrapper(win, row, column, text, /, *args):
-    global START_INDEX  # pylint: disable=W0603 (global-statement)
+    global START_INDEX, COLOR_UP  # pylint: disable=W0603 (global-statement)
     color_index = START_INDEX
 
     log.debug("addstr to line %d", row)
@@ -157,11 +158,16 @@ def _addstr_with_colors_wrapper(win, row, column, text, /, *args):
     except curses.error:
         log.exception("Error in addstr")
 
-    START_INDEX += 1
-    if ((START_INDEX - 2) % (2 * NUM_COLORS)) == (2 * NUM_COLORS) - 1:
-        START_INDEX = 2
-    elif START_INDEX < 2:
-        START_INDEX = (2 * NUM_COLORS) - 1
+    if COLOR_UP:
+        START_INDEX += 1
+        if START_INDEX == NUM_COLORS + 1:
+            COLOR_UP = False
+            START_INDEX = NUM_COLORS
+    else:
+        START_INDEX -= 1
+        if START_INDEX == 1:
+            COLOR_UP = True
+            START_INDEX = 2
 
 
 def _check_quit(win, box, term_size, min_scroll_line, scroller):
@@ -201,7 +207,7 @@ def _init_colors():
         color_value = int(low_color + (val - 2) * color_increase)
         curses.init_color(val, color_value, color_value, color_value)
         curses.init_pair(val, val, curses.COLOR_BLACK)
-        log.debug("initialized color index: %d", val)
+        log.debug("initialized color index: %d  with color value: %d", val, color_value)
 
 
 def work(cfg):
