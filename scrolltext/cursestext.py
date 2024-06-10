@@ -23,12 +23,16 @@ def curses_scroller(win, cfg):
     global NUM_COLORS  # pylint: disable=W0603 (global-statement)
     if not IS_WINDOWS:
         curses.curs_set(0)  # Hide the cursor
-    if curses.has_colors():
+    use_color = cfg["main"].getboolean("color", 0)
+    log.debug("use color: %d", use_color)
+    if use_color and curses.has_colors():
         log.debug("curses has colors %d", curses.COLORS)
+        log.debug("curses can change color %d", curses.can_change_color())
         NUM_COLORS = cfg["cursestext"].getint("num_colors", 18)
         NUM_COLORS = min(NUM_COLORS, curses.COLORS - 2)
-        _init_colors()
-        log.info("using %d colors", curses.COLORS)
+        if curses.can_change_color():
+            _init_colors()
+        log.info("using %d colors", NUM_COLORS)
 
     term_size = TermSize(0, 0)
     update_term_size(win, cfg["cursestext"].getboolean("box"), term_size)
@@ -56,11 +60,9 @@ def do_textloop(win, cfg, term_size, scroller, min_scroll_line):
         #       moving the text upwards, by removing the last character of the visibile text.
         if not box and scroller.line == term_size.get_rows():
             win_text = text[:-1]
-        if scroller.line >= min_scroll_line:
-            _addstr_wrapper(win, scroller.line, (1 if box else 0), win_text)
-            win.redrawwin()
-        character = get_char(win)
-        if character == curses.KEY_EXIT:
+        term_too_small_printed = _draw_text(win, cfg, scroller, term_size, box, win_text,
+                                            min_scroll_line, term_too_small_printed)
+        if _check_quit(win, box, term_size, min_scroll_line, scroller):
             return
 
 
@@ -164,9 +166,11 @@ def _check_quit(win, box, term_size, min_scroll_line, scroller):
 
 
 # pylint: disable=too-many-arguments (R0913)
-def _draw_text(win, scroller, term_size, box, win_text, min_scroll_line, term_too_small_printed):
+def _draw_text(win, cfg, scroller, term_size, box,
+               win_text, min_scroll_line, term_too_small_printed):
     if scroller.line >= min_scroll_line:
-        if curses.has_colors():
+        if (cfg["main"].getboolean("color", 0)
+            and curses.has_colors() and curses.can_change_color()):
             _addstr_with_colors_wrapper(win, scroller.line, (1 if box else 0), win_text)
         else:
             _addstr_wrapper(win, scroller.line, (1 if box else 0), win_text)
